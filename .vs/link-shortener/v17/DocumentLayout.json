@@ -38,8 +38,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 6,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 6,
@@ -50,7 +62,8 @@
               "RelativeToolTip": "link-shortener\\link-shortener.csproj",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-04-29T22:08:21.503Z"
+              "WhenOpened": "2024-04-29T22:08:21.503Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -62,8 +75,7 @@
               "RelativeToolTip": "link-shortener\\ApplicationDbContext.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAA5AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-29T22:08:41.589Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-29T22:08:41.589Z"
             },
             {
               "$type": "Document",
@@ -75,8 +87,7 @@
               "RelativeToolTip": "link-shortener\\Entities\\ShortenedUrl.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-29T21:42:26.735Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-29T21:42:26.735Z"
             },
             {
               "$type": "Document",
@@ -86,7 +97,7 @@
               "RelativeDocumentMoniker": "link-shortener\\Program.cs",
               "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Program.cs",
               "RelativeToolTip": "link-shortener\\Program.cs",
-              "ViewState": "AQIAADoAAAAAAAAAAAAqwEUAAABEAAAA",
+              "ViewState": "AQIAADoAAAAAAAAAAAAqwFEAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-29T21:19:26.399Z",
               "EditorCaption": ""
@@ -101,8 +112,7 @@
               "RelativeToolTip": "link-shortener\\appsettings.json",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2024-05-05T22:24:45.491Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-05T22:24:45.491Z"
             },
             {
               "$type": "Document",
@@ -114,8 +124,7 @@
               "RelativeToolTip": "link-shortener\\Models\\ShortenUrlRequest.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAA3AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-29T21:23:27.496Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-29T21:23:27.496Z"
             },
             {
               "$type": "Document",
@@ -127,8 +136,7 @@
               "RelativeToolTip": "link-shortener\\Extensions\\MigrationExtensions.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-29T23:04:47.066Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-29T23:04:47.066Z"
             }
           ]
         }
