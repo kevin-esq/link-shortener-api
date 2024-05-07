@@ -1,12 +1,13 @@
 ﻿using link_shortener.Entities;
-using link_shortener.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace link_shortener
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options) 
+        private const int NumberOfCharsInShortlink = 7;
+
+        public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
 
@@ -14,10 +15,14 @@ namespace link_shortener
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureShortenedUrlEntity(modelBuilder);
+        }
+
+        private void ConfigureShortenedUrlEntity(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<ShortenedUrl>(builder =>
             {
-                builder.Property(s => s.Code).HasMaxLength(UrlShorteningService.NumberOfCharsInShortlink);
-
+                builder.Property(s => s.Code).HasMaxLength(NumberOfCharsInShortlink);
                 builder.HasIndex(s => s.Code).IsUnique();
             });
         }

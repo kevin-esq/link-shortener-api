@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("link-shortener")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a79bd1e91a4768c160f717575608b6cd8117ab4")]
 [assembly: System.Reflection.AssemblyProductAttribute("link-shortener")]
 [assembly: System.Reflection.AssemblyTitleAttribute("link-shortener")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

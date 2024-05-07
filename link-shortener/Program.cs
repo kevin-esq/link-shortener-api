@@ -7,21 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<ApplicationDbContext>(o => 
-    o.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
-
-builder.Services.AddScoped<UrlShorteningService>();
-
-builder.Services.AddMemoryCache();
-
+ConfigureServices(builder);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,15 +15,30 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
     app.ApplyMigrations();
 }
 
-app.MapPost("api/shorten", async (
-    ShortenUrlRequest request,
-    UrlShorteningService urlShorteningService, 
-    ApplicationDbContext applicationDbContext, 
-    HttpContext httpContext) =>
+app.MapPost("api/shorten", HandleShortenRequest);
+app.MapGet("api/{code}", HandleGetRequest);
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+void ConfigureServices(WebApplicationBuilder builder)
+{
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+    builder.Services.AddDbContext<ApplicationDbContext>(o =>
+        o.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
+    builder.Services.AddScoped<UrlShorteningService>();
+    builder.Services.AddMemoryCache();
+}
+
+async Task<IResult> HandleShortenRequest(ShortenUrlRequest request, UrlShorteningService urlShorteningService,
+    ApplicationDbContext applicationDbContext, HttpContext httpContext)
 {
     if (!Uri.TryCreate(request.Url, UriKind.Absolute, out _))
     {
@@ -45,7 +46,6 @@ app.MapPost("api/shorten", async (
     }
 
     var code = await urlShorteningService.GenerateUniqueCode();
-
     var shortenedUrl = new ShortenedUrl
     {
         Id = Guid.NewGuid(),
@@ -56,13 +56,12 @@ app.MapPost("api/shorten", async (
     };
 
     applicationDbContext.ShortenedUrls.Add(shortenedUrl);
-
     await applicationDbContext.SaveChangesAsync();
 
     return Results.Ok(shortenedUrl.ShortUrl);
-});
+}
 
-app.MapGet("api/{code}", async (string code, ApplicationDbContext dbContext, IMemoryCache cache) =>
+async Task<IResult> HandleGetRequest(string code, ApplicationDbContext dbContext, IMemoryCache cache)
 {
     var shortenedCode = await cache.GetOrCreateAsync(code, async entry =>
     {
@@ -76,12 +75,4 @@ app.MapGet("api/{code}", async (string code, ApplicationDbContext dbContext, IMe
     }
 
     return Results.Redirect(shortenedCode.LongUrl);
-});
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using link_shortener;
 
 namespace link_shortener.Extensions
@@ -8,9 +9,12 @@ namespace link_shortener.Extensions
         public static void ApplyMigrations(this WebApplication app)
         {
             using var scope = app.Services.CreateScope();
+            MigrateDatabase(scope.ServiceProvider);
+        }
 
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
+        private static void MigrateDatabase(IServiceProvider services)
+        {
+            var dbContext = services.GetRequiredService<ApplicationDbContext>();
             dbContext.Database.Migrate();
         }
     }

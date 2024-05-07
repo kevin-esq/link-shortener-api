@@ -1,7 +1,7 @@
 [
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_2",
+    "ContainingType": "Program",
+    "Method": "\u003C\u003CMain\u003E$\u003Eg__HandleGetRequest|0_2",
     "RelativePath": "api/{code}",
     "HttpMethod": "GET",
     "IsController": false,
@@ -22,8 +22,8 @@
     ]
   },
   {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_1",
+    "ContainingType": "Program",
+    "Method": "\u003C\u003CMain\u003E$\u003Eg__HandleShortenRequest|0_1",
     "RelativePath": "api/shorten",
     "HttpMethod": "POST",
     "IsController": false,

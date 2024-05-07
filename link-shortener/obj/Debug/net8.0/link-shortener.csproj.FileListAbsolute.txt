@@ -134,3 +134,4 @@ C:\Users\Minio\OneDrive\Personal Projects\Asp.net\link-shortener\link-shortener\
 C:\Users\Minio\OneDrive\Personal Projects\Asp.net\link-shortener\link-shortener\obj\Debug\net8.0\link-shortener.pdb
 C:\Users\Minio\OneDrive\Personal Projects\Asp.net\link-shortener\link-shortener\obj\Debug\net8.0\link-shortener.genruntimeconfig.cache
 C:\Users\Minio\OneDrive\Personal Projects\Asp.net\link-shortener\link-shortener\obj\Debug\net8.0\ref\link-shortener.dll
+C:\Users\Minio\OneDrive\Personal Projects\Asp.net\link-shortener\link-shortener\obj\Debug\net8.0\link-shortener.sourcelink.json
