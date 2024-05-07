@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "O/CaArWUVmtUIkuigj1f0OfRwD7M6fYkhE6wR9JuFT0=",
+  "Source": "link-shortener",
+  "BasePath": "_content/link-shortener",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,0 +1,138 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\extensions\\migrationextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\extensions\\migrationextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\entities\\shortenedurl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\entities\\shortenedurl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\models\\shortenurlrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\models\\shortenurlrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|c:\\users\\minio\\onedrive\\personal projects\\asp.net\\link-shortener\\link-shortener\\link-shortener.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{86F5FBBE-9DF5-40DB-A206-85B61314B183}|link-shortener\\link-shortener.csproj|solutionrelative:link-shortener\\link-shortener.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "link-shortener.csproj",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\link-shortener.csproj",
+              "RelativeDocumentMoniker": "link-shortener\\link-shortener.csproj",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\link-shortener.csproj",
+              "RelativeToolTip": "link-shortener\\link-shortener.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-04-29T22:08:21.503Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "link-shortener\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\ApplicationDbContext.cs",
+              "RelativeToolTip": "link-shortener\\ApplicationDbContext.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAA5AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-29T22:08:41.589Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ShortenedUrl.cs",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Entities\\ShortenedUrl.cs",
+              "RelativeDocumentMoniker": "link-shortener\\Entities\\ShortenedUrl.cs",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Entities\\ShortenedUrl.cs",
+              "RelativeToolTip": "link-shortener\\Entities\\ShortenedUrl.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-29T21:42:26.735Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Program.cs",
+              "RelativeDocumentMoniker": "link-shortener\\Program.cs",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Program.cs",
+              "RelativeToolTip": "link-shortener\\Program.cs",
+              "ViewState": "AQIAADoAAAAAAAAAAAAqwEUAAABEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-29T21:19:26.399Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\appsettings.json",
+              "RelativeDocumentMoniker": "link-shortener\\appsettings.json",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\appsettings.json",
+              "RelativeToolTip": "link-shortener\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-05-05T22:24:45.491Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ShortenUrlRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Models\\ShortenUrlRequest.cs",
+              "RelativeDocumentMoniker": "link-shortener\\Models\\ShortenUrlRequest.cs",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Models\\ShortenUrlRequest.cs",
+              "RelativeToolTip": "link-shortener\\Models\\ShortenUrlRequest.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAA3AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-29T21:23:27.496Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MigrationExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Extensions\\MigrationExtensions.cs",
+              "RelativeDocumentMoniker": "link-shortener\\Extensions\\MigrationExtensions.cs",
+              "ToolTip": "C:\\Users\\Minio\\OneDrive\\Personal Projects\\Asp.net\\link-shortener\\link-shortener\\Extensions\\MigrationExtensions.cs",
+              "RelativeToolTip": "link-shortener\\Extensions\\MigrationExtensions.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-29T23:04:47.066Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
