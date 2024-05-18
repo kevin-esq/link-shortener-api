@@ -10,6 +10,10 @@ Este repositorio contiene el código base para un potencial Acortador de Enlaces
 2. Navega hasta el directorio del proyecto con `cd ruta/a/tu/proyecto`.
 3. Instala las dependencias necesarias con `dotnet restore`.
 4. Ejecuta el proyecto con `dotnet run`.
+5. Ejecuta las migraciones para crear la base de datos con:
+     ```bash
+     dotnet ef migrations add InitialCreate
+     dotnet ef database update
 
 ## Uso
 
