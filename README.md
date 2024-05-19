@@ -1,39 +1,51 @@
+
 # Link Shortener API
 
-## Descripción
+This repository contains the base code for a potential Link Shorter API. Although not yet deployed as a service, the code provides a robust and efficient solution for transforming long, complicated URLs into shorter, more manageable addresses. This project represents an opportunity to explore and learn about link optimization techniques.
 
-Este repositorio contiene el código base para un potencial Acortador de Enlaces API. Aunque aún no está implementado como un servicio desplegado, el código proporciona una solución robusta y eficiente para transformar URLs largas y complicadas en direcciones más cortas y manejables. Este proyecto representa una oportunidad para explorar y aprender sobre las técnicas de optimización de enlaces.
 
-## Instalación
+## Installation
 
-1. Clona este repositorio en tu máquina local con `git clone https://github.com/tu-usuario/tu-repositorio.git`.
-2. Navega hasta el directorio del proyecto con `cd ruta/a/tu/proyecto`.
-3. Instala las dependencias necesarias con `dotnet restore`.
-4. Ejecuta el proyecto con `dotnet run`.
-5. Ejecuta las migraciones para crear la base de datos con:
+1. Clone this repository on your local machine with `git clone https://github.com/your-user/your-repository.git`.
+2. Navigate to the project directory with `cd route/to/your/project`.
+3. Install the required dependencies with `dotnet restore`.
+4. Run migrations to create the database with:
      ```bash
      dotnet ef migrations add InitialCreate
      dotnet ef database update
+    
+## Deployment
 
-## Uso
+Run the project with:
 
-Para acortar una URL, realiza una solicitud POST a `http://localhost:5000/api/shorten` con un cuerpo JSON que contenga la URL que deseas acortar. Por ejemplo:
+```bash
+  dotnet run
+```
 
+
+## API Reference
+
+#### Short Url
+
+```http
+  POST /api/shorten
+```
 ```json
 {
     "Url": "https://www.ejemplo.com"
 }
 ```
 
-La API te devolverá una URL corta que puedes usar en lugar de la URL original.
+The API will return you a short URL that you can use instead of the original URL.
+## Contributing
 
-Contribuciones
-Las contribuciones son bienvenidas. Por favor, abre un issue para discutir lo que te gustaría cambiar o añadir.
+Contributions are always welcome!
 
-Licencia
-                    GNU GENERAL PUBLIC LICENSE
-                       Version 3, 29 June 2007
+See `contributing.md` for ways to get started.
 
- Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.
+Please adhere to this project's `code of conduct`.
+
+
+## License
+
+[GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
