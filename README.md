@@ -1,7 +1,7 @@
 # Link Shortener API
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![.NET](https://img.shields.io/badge/.NET-6.0+-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-8.0+-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 
 A robust and efficient RESTful API for transforming long URLs into shorter, more manageable addresses. Built with ASP.NET Core and Entity Framework, this project provides a solid foundation for URL shortening services with clean architecture and comprehensive documentation.
 
