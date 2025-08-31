@@ -247,14 +247,4 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 - Database management with [Entity Framework Core](https://docs.microsoft.com/ef/core/)
 - API documentation powered by [Swagger/OpenAPI](https://swagger.io/)
 
-## 📞 Support
-
-If you have any questions or need help:
-
-- Open an [issue](https://github.com/kevin-esq/link-shortener-api/issues)
-- Check the [documentation](https://github.com/kevin-esq/link-shortener-api/wiki)
-- Contact: [your-email@example.com](mailto:your-email@example.com)
-
----
-
 ⭐ **Star this repository if you found it helpful!**
