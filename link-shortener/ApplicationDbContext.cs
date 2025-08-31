@@ -7,14 +7,16 @@ namespace link_shortener
     {
         private const int NumberOfCharsInShortlink = 7;
 
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
         {
         }
 
-        public DbSet<ShortenedUrl> ShortenedUrls { get; set; }
+        public DbSet<ShortenedUrl> ShortenedUrls { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             ConfigureShortenedUrlEntity(modelBuilder);
         }
 
@@ -22,8 +24,26 @@ namespace link_shortener
         {
             modelBuilder.Entity<ShortenedUrl>(builder =>
             {
-                builder.Property(s => s.Code).HasMaxLength(NumberOfCharsInShortlink);
-                builder.HasIndex(s => s.Code).IsUnique();
+                builder.HasKey(s => s.Id);
+
+                builder.Property(s => s.LongUrl)
+                       .IsRequired()
+                       .HasColumnType("nvarchar(max)");
+
+                builder.Property(s => s.ShortUrl)
+                       .IsRequired()
+                       .HasMaxLength(500);
+
+                builder.Property(s => s.Code)
+                       .IsRequired()
+                       .HasMaxLength(NumberOfCharsInShortlink);
+
+                builder.HasIndex(s => s.Code)
+                       .IsUnique();
+
+                builder.Property(s => s.CreateOnUtc)
+                       .IsRequired()
+                       .HasColumnType("datetime2");
             });
         }
     }

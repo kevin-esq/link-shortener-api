@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder);
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -19,7 +18,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapPost("api/shorten", HandleShortenRequest);
-app.MapGet("api/{code}", HandleGetRequest);
+app.MapGet("s/{code}", HandleGetRequest);
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
@@ -51,7 +50,7 @@ async Task<IResult> HandleShortenRequest(ShortenUrlRequest request, UrlShortenin
         Id = Guid.NewGuid(),
         LongUrl = request.Url,
         Code = code,
-        ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/api/{code}",
+        ShortUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/s/{code}",
         CreateOnUtc = DateTime.UtcNow
     };
 
