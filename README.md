@@ -1,7 +1,7 @@
 # Link Shortener API
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![.NET](https://img.shields.io/badge/.NET-6.0+-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-8.0+-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 
 A robust and efficient RESTful API for transforming long URLs into shorter, more manageable addresses. Built with ASP.NET Core and Entity Framework, this project provides a solid foundation for URL shortening services with clean architecture and comprehensive documentation.
 
@@ -246,15 +246,5 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 - Built with [ASP.NET Core](https://docs.microsoft.com/aspnet/core/)
 - Database management with [Entity Framework Core](https://docs.microsoft.com/ef/core/)
 - API documentation powered by [Swagger/OpenAPI](https://swagger.io/)
-
-## 📞 Support
-
-If you have any questions or need help:
-
-- Open an [issue](https://github.com/kevin-esq/link-shortener-api/issues)
-- Check the [documentation](https://github.com/kevin-esq/link-shortener-api/wiki)
-- Contact: [your-email@example.com](mailto:your-email@example.com)
-
----
 
 ⭐ **Star this repository if you found it helpful!**
