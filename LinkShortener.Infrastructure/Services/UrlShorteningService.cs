@@ -1,8 +1,8 @@
-﻿using link_shortener.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using LinkShortener.Entities;
 
-namespace link_shortener.Services
+namespace LinkShortener.Infrastructure.Services
 {
     public class UrlShorteningService
     {
@@ -18,7 +18,6 @@ namespace link_shortener.Services
             _context = context;
             _cache = cache;
         }
-
         public async Task<string> GenerateUniqueCode()
         {
             while (true)
@@ -31,6 +30,19 @@ namespace link_shortener.Services
                 }
             }
         }
+        public async Task<string?> GetLongUrlAsync(string code)
+        {
+            var shortened = await _cache.GetOrCreateAsync(code, async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+
+                return await _context.ShortenedUrls
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.Code == code);
+            });
+
+            return shortened?.LongUrl;
+        }
 
         private string GenerateCode()
         {
@@ -38,21 +50,15 @@ namespace link_shortener.Services
 
             for (int i = 0; i < NumberOfCharsInShortlink; i++)
             {
-                var randomIndex = _random.Next(Alphabet.Length - 1);
+                var randomIndex = _random.Next(Alphabet.Length);
                 codeChars[i] = Alphabet[randomIndex];
             }
 
             return new string(codeChars);
         }
-
         private async Task<bool> IsUnique(string code)
         {
-            return await _cache.GetOrCreateAsync(code, async entry =>
-            {
-                entry.SlidingExpiration = TimeSpan.FromMinutes(5);
-                var shortenedUrl = await _context.ShortenedUrls.FirstOrDefaultAsync(s => s.Code == code);
-                return shortenedUrl is null;
-            });
+            return !await _context.ShortenedUrls.AnyAsync(s => s.Code == code);
         }
     }
 }

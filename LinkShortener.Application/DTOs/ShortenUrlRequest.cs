@@ -1,4 +1,4 @@
-﻿namespace link_shortener.Models
+﻿namespace LinkShortener.Application.DTOs
 {
     public class ShortenUrlRequest
     {

@@ -1,7 +1,7 @@
-﻿using link_shortener.Entities;
+﻿using LinkShortener.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace link_shortener
+namespace LinkShortener.Infrastructure
 {
     public class ApplicationDbContext : DbContext
     {
