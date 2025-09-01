@@ -1,51 +1,145 @@
-
 # Link Shortener API
 
-This repository contains the base code for a potential Link Shorter API. Although not yet deployed as a service, the code provides a robust and efficient solution for transforming long, complicated URLs into shorter, more manageable addresses. This project represents an opportunity to explore and learn about link optimization techniques.
+[![.NET](https://img.shields.io/badge/.NET-8.0+-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 
+Simple and efficient RESTful API to shorten URLs and handle automatic redirection.
+Built with **ASP.NET Core 8**, **Entity Framework Core**, and a clean, extensible architecture.
 
-## Installation
+## ✨ Features
 
-1. Clone this repository on your local machine with `git clone https://github.com/your-user/your-repository.git`.
-2. Navigate to the project directory with `cd route/to/your/project`.
-3. Install the required dependencies with `dotnet restore`.
-4. Run migrations to create the database with:
-     ```bash
-     dotnet ef migrations add InitialCreate
-     dotnet ef database update
-    
-## Deployment
+- **Shorten URLs**: Convert long links into short codes
+- **Automatic redirection**: Access short codes and get redirected to the original URL
+- **Database persistence**: Store links using EF Core + SQL Server
+- **Swagger/OpenAPI**: Interactive documentation for testing endpoints
+- **Caching**: In-memory caching for faster lookups
 
-Run the project with:
+## 🚀 Getting Started
 
-```bash
-  dotnet run
-```
+### Prerequisites
 
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- SQL Server (LocalDB works fine for development)
 
-## API Reference
+### Installation
 
-#### Short Url
+1. **Clone the repository**
 
-```http
-  POST /api/shorten
-```
+   ```bash
+   git clone https://github.com/kevin-esq/link-shortener-api.git
+   cd link-shortener-api
+   ```
+
+2. **Restore dependencies**
+
+   ```bash
+   dotnet restore
+   ```
+
+3. **Apply migrations & create database**
+
+   ```bash
+   dotnet ef migrations add InitialCreate
+   dotnet ef database update
+   ```
+
+4. **Run the project**
+
+   ```bash
+   dotnet run
+   ```
+
+By default the API will be available at:
+
+- Swagger: `https://localhost:7092/swagger`
+- API Base: `https://localhost:7092/api`
+
+## 📖 API Endpoints
+
+### 1. Shorten a URL
+
+**POST** `/api/shorten`
+
+Request:
+
 ```json
 {
-    "Url": "https://www.ejemplo.com"
+  "url": "https://example.com/very/long/link"
 }
 ```
 
-The API will return you a short URL that you can use instead of the original URL.
-## Contributing
+Response:
 
-Contributions are always welcome!
+```json
+{
+  "shortUrl": "https://localhost:7092/s/abc123",
+  "originalUrl": "https://example.com/very/long/link",
+  "code": "abc123"
+}
+```
 
-See `contributing.md` for ways to get started.
+---
 
-Please adhere to this project's `code of conduct`.
+### 2. Redirect to Original URL
 
+**GET** `/s/{code}`
 
-## License
+Example:
 
-[GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
+```http
+GET /s/abc123
+```
+
+Response:
+
+- `302 Found` → Redirects to the original URL
+- `404 Not Found` → Code not found
+
+---
+
+### 3. (Preview) Get URL info
+
+**GET** `/api/info/{code}`
+
+Response:
+
+```json
+{
+  "shortUrl": "https://localhost:7092/s/abc123",
+  "originalUrl": "https://example.com/very/long/link",
+  "code": "abc123",
+  "createdAt": "2024-08-30T10:30:00Z"
+}
+```
+
+---
+
+## 🔧 Configuration
+
+Update `appsettings.json` with your connection string:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=LinkShortenerDb;Trusted_Connection=True;"
+  }
+}
+```
+
+## 🧪 Testing
+
+Run all tests:
+
+```bash
+dotnet test
+```
+
+## 📋 Roadmap
+
+- [ ] Add custom codes support
+- [ ] Add click tracking
+- [ ] Add expiration dates
+- [ ] Redis cache layer
+
+## 📄 License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file.

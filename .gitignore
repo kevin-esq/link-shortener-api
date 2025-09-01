@@ -1,0 +1,59 @@
+# Visual Studio user-specific files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+out/
+
+# Log and temporary files
+*.log
+*.tlog
+*.tmp
+*.temp
+*.dbmdl
+*.bak
+*.Backup
+*.swp
+
+# Local configuration files
+*.local.json
+appsettings.Development.json
+
+# Rider/Resharper cache and settings
+.idea/
+*.DotSettings.user
+
+# Test results and code coverage
+TestResult*/
+coverage*/
+*.coverage
+*.coveragexml
+
+# Publish output
+publish/
+*.pubxml
+*.publishsettings
+
+# Visual Studio generated files
+Generated\ Files/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project-specific ignores
+/.vs
+*.vsidx
+/link-shortener/bin
+/link-shortener/obj
+link-shortener/obj/Debug/net8.0/apphost.exe
+link-shortener/obj/Debug/net8.0/link-shortener.AssemblyInfo.cs
+link-shortener/obj/Debug/net8.0/link-shortener.AssemblyInfoInputs.cache
+link-shortener/obj/Debug/net8.0/link-shortener.assets.cache
+link-shortener/obj/Debug/net8.0/link-shortener.GeneratedMSBuildEditorConfig.editorconfig

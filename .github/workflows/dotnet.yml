@@ -1,28 +1,51 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Build & Test (.NET 8)
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main", "develop" ]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore LinkShortener.Api/LinkShortener.Api.csproj
+
+      - name: Build
+        run: dotnet build LinkShortener.Api/LinkShortener.Api.csproj --no-restore --configuration Release
+
+      - name: Run Tests
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Check code formatting
+        run: dotnet format --verify-no-changes || echo "⚠️ Code formatting issues found"
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Validate EF migrations
+        run: |
+          dotnet ef migrations script \
+            --project LinkShortener.Infrastructure/LinkShortener.Infrastructure.csproj \
+            --startup-project LinkShortener.Api/LinkShortener.Api.csproj \
+            --idempotent \
+            -o migration-check.sql
