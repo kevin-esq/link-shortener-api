@@ -1,25 +1,18 @@
 ﻿using LinkShortener.Application.Abstractions;
-using LinkShortener.Entities;
+using LinkShortener.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace LinkShortener.Infrastructure.Services
 {
-    public class UrlShorteningAppService : IUrlShorteningAppService
+    public class UrlShorteningAppService(
+        UrlShorteningService urlShorteningService,
+        ApplicationDbContext dbContext,
+        IMemoryCache cache) : IUrlShorteningAppService
     {
-        private readonly UrlShorteningService _urlShorteningService;
-        private readonly ApplicationDbContext _dbContext;
-        private readonly IMemoryCache _cache;
-
-        public UrlShorteningAppService(
-            UrlShorteningService urlShorteningService,
-            ApplicationDbContext dbContext,
-            IMemoryCache cache)
-        {
-            _urlShorteningService = urlShorteningService;
-            _dbContext = dbContext;
-            _cache = cache;
-        }
+        private readonly UrlShorteningService _urlShorteningService = urlShorteningService;
+        private readonly ApplicationDbContext _dbContext = dbContext;
+        private readonly IMemoryCache _cache = cache;
 
         public async Task<string> ShortenUrlAsync(string url, string scheme, string host)
         {

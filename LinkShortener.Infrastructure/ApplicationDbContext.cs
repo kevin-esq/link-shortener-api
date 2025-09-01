@@ -1,16 +1,11 @@
-﻿using LinkShortener.Entities;
+﻿using LinkShortener.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LinkShortener.Infrastructure
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         private const int NumberOfCharsInShortlink = 7;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
 
         public DbSet<ShortenedUrl> ShortenedUrls { get; set; } = null!;
 
@@ -20,7 +15,7 @@ namespace LinkShortener.Infrastructure
             ConfigureShortenedUrlEntity(modelBuilder);
         }
 
-        private void ConfigureShortenedUrlEntity(ModelBuilder modelBuilder)
+        private static void ConfigureShortenedUrlEntity(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ShortenedUrl>(builder =>
             {

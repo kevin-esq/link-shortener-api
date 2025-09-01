@@ -1,23 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using LinkShortener.Entities;
 
 namespace LinkShortener.Infrastructure.Services
 {
-    public class UrlShorteningService
+    public class UrlShorteningService(ApplicationDbContext context, IMemoryCache cache)
     {
         public const int NumberOfCharsInShortlink = 7;
         private const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
         private readonly Random _random = new();
-        private readonly ApplicationDbContext _context;
-        private readonly IMemoryCache _cache;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IMemoryCache _cache = cache;
 
-        public UrlShorteningService(ApplicationDbContext context, IMemoryCache cache)
-        {
-            _context = context;
-            _cache = cache;
-        }
         public async Task<string> GenerateUniqueCode()
         {
             while (true)
