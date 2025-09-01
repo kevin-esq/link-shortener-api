@@ -43,8 +43,9 @@ jobs:
         run: dotnet tool restore
 
       - name: Validate EF migrations
-        run: dotnet ef migrations script \
-          --project LinkShortener.Infrastructure/LinkShortener.Infrastructure.csproj \
-          --startup-project LinkShortener.Api/LinkShortener.Api.csproj \
-          --idempotent -o migration-check.sql
-
+        run: |
+          dotnet ef migrations script \
+            --project LinkShortener.Infrastructure/LinkShortener.Infrastructure.csproj \
+            --startup-project LinkShortener.Api/LinkShortener.Api.csproj \
+            --idempotent \
+            -o migration-check.sql
