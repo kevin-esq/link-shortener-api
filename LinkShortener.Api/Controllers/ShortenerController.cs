@@ -6,14 +6,9 @@ namespace LinkShortener.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ShortenerController : ControllerBase
+    public class ShortenerController(IUrlShorteningAppService shorteningService) : ControllerBase
     {
-        private readonly IUrlShorteningAppService _shorteningService;
-
-        public ShortenerController(IUrlShorteningAppService shorteningService)
-        {
-            _shorteningService = shorteningService;
-        }
+        private readonly IUrlShorteningAppService _shorteningService = shorteningService;
 
         [HttpPost("shorten")]
         public async Task<IActionResult> Shorten([FromBody] ShortenUrlRequest request)
