@@ -28,16 +28,19 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore link-shortener/link-shortener.csproj
+        run: dotnet restore LinkShortener.Api/LinkShortener.Api.csproj
 
       - name: Build
-        run: dotnet build link-shortener/link-shortener.csproj --no-restore --configuration Release
+        run: dotnet build LinkShortener.Api/LinkShortener.Api.csproj --no-restore --configuration Release
 
       - name: Run Tests
-        run: dotnet test link-shortener.Tests/link-shortener.Tests.csproj --no-build --verbosity normal --configuration Release
+        run: dotnet test --no-build --configuration Release --verbosity normal
 
       - name: Check code formatting
         run: dotnet format --verify-no-changes || echo "⚠️ Code formatting issues found"
 
       - name: Validate EF migrations
-        run: dotnet ef migrations script --project link-shortener/link-shortener.csproj --startup-project link-shortener/link-shortener.csproj --idempotent -o migration-check.sql
+        run: dotnet ef migrations script \
+          --project LinkShortener.Infrastructure/LinkShortener.Infrastructure.csproj \
+          --startup-project LinkShortener.Api/LinkShortener.Api.csproj \
+          --idempotent -o migration-check.sql
