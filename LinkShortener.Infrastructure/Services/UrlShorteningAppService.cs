@@ -1,4 +1,5 @@
 ﻿using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.DTOs;
 using LinkShortener.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -14,7 +15,7 @@ namespace LinkShortener.Infrastructure.Services
         private readonly ApplicationDbContext _dbContext = dbContext;
         private readonly IMemoryCache _cache = cache;
 
-        public async Task<string> ShortenUrlAsync(string url, string scheme, string host)
+        public async Task<ShortenUrlResponse> ShortenUrlAsync(string url, string scheme, string host)
         {
             var code = await _urlShorteningService.GenerateUniqueCode();
 
@@ -30,7 +31,12 @@ namespace LinkShortener.Infrastructure.Services
             _dbContext.ShortenedUrls.Add(shortenedUrl);
             await _dbContext.SaveChangesAsync();
 
-            return shortenedUrl.ShortUrl;
+            return new ShortenUrlResponse
+            {
+                ShortUrl = shortenedUrl.ShortUrl,
+                OriginalUrl = shortenedUrl.LongUrl,
+                Code = shortenedUrl.Code
+            };
         }
 
         public async Task<string?> GetLongUrlAsync(string code)
