@@ -1,4 +1,4 @@
-@baseUrl = https://localhost:5001
+@baseUrl = https://localhost:7205
 
 POST {{baseUrl}}/api/shortener/shorten
 Content-Type: application/json
@@ -6,5 +6,3 @@ Content-Type: application/json
 {
   "url": "https://google.com"
 }
-
-GET {{baseUrl}}/s/{{code}}
