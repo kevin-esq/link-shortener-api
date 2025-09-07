@@ -1,6 +1,7 @@
-using LinkShortener.Infrastructure;
-using LinkShortener.Infrastructure.Services;
 using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Features.ShortenUrl;
+using LinkShortener.Infrastructure;
+using LinkShortener.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,10 +13,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!));
 
-builder.Services.AddScoped<IUrlShorteningAppService, UrlShorteningAppService>();
-builder.Services.AddScoped<UrlShorteningService>();
+builder.Services.AddScoped<IUrlRepository, UrlRepository>();
 
 builder.Services.AddMemoryCache();
+
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(ShortenUrlCommandHandler).Assembly)
+);
 
 var app = builder.Build();
 

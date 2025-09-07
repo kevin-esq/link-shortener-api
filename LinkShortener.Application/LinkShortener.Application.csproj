@@ -12,7 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LinkShortener.Domain\LinkShortener.Domain.csproj" />
+		<ProjectReference Include="..\LinkShortener.Domain\LinkShortener.Domain.csproj" />
 	</ItemGroup>
 
 </Project>
