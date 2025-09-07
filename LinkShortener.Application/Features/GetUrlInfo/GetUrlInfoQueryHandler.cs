@@ -1,31 +1,27 @@
 ﻿using LinkShortener.Application.Abstractions;
-using LinkShortener.Application.DTOs;
+using LinkShortener.Application.DTOs.GetUrlInfo;
+using LinkShortener.Application.DTOs.ShortenUrl;
 using MediatR;
 using System;
 
 namespace LinkShortener.Application.Features.GetUrlInfo
 {
-    public class GetUrlInfoQueryHandler : IRequestHandler<GetUrlInfoQuery, ShortenUrlResponse?>
+    public class GetUrlInfoQueryHandler(IUrlRepository repository) : IRequestHandler<GetUrlInfoQuery, GetUrlInfoResponse?>
     {
-        private readonly IUrlRepository _repository;
+        private readonly IUrlRepository _repository = repository;
 
-        public GetUrlInfoQueryHandler(IUrlRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<ShortenUrlResponse?> Handle(GetUrlInfoQuery request, CancellationToken cancellationToken)
+        public async Task<GetUrlInfoResponse?> Handle(GetUrlInfoQuery request, CancellationToken cancellationToken)
         {
             var entity = await _repository.GetByCodeAsync(request.Code, cancellationToken);
 
             if (entity is null)
                 return null;
 
-            return new ShortenUrlResponse
+            return new GetUrlInfoResponse
             {
-                ShortUrl = $"https://localhost:7092/s/{entity.Code}",
+                ShortUrl = $"{request.Scheme}://{request.Host}/s/{request.Code}",
                 OriginalUrl = entity.LongUrl,
-                Code = entity.Code,
+                CreatedAt = entity.CreateOnUtc
             };
         }
     }
