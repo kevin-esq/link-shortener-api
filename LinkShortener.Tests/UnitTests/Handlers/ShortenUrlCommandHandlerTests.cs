@@ -23,7 +23,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(command.Url, result.OriginalUrl);
+            Assert.Equal(command.OriginalUrl, result.OriginalUrl);
             Assert.NotNull(result.ShortUrl);
             Assert.Equal(7, result.Code.Length);
         }

@@ -1,4 +1,5 @@
-﻿using LinkShortener.Application.DTOs;
+﻿using LinkShortener.Application.DTOs.GetUrlInfo;
+using LinkShortener.Application.DTOs.ShortenUrl;
 using LinkShortener.Application.Features.GetUrlInfo;
 using LinkShortener.Application.Features.ShortenUrl.LinkShortener.Application.Features.ShortenUrl;
 using MediatR;
@@ -8,14 +9,9 @@ namespace LinkShortener.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UrlController : ControllerBase
+    public class UrlController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public UrlController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         /// <summary>
         /// Shortens a long URL into a short code
@@ -37,10 +33,13 @@ namespace LinkShortener.Api.Controllers
         /// <summary>
         /// Redirects to the original long URL
         /// </summary>
-        [HttpGet("/s/{code}")]
-        public async Task<IActionResult> RedirectToLongUrl(string code)
+        [HttpGet("/s/{Code}")]
+        public async Task<IActionResult> RedirectToLongUrl(string Code)
         {
-            var result = await _mediator.Send(new GetUrlInfoQuery(code));
+            var result = await _mediator.Send(new GetUrlInfoQuery(
+                Code, Request.Scheme,
+                Request.Host.ToString())
+                );
 
             if (result == null)
                 return NotFound();
@@ -54,7 +53,7 @@ namespace LinkShortener.Api.Controllers
         [HttpGet("info/{code}")]
         public async Task<IActionResult> GetInfo(string code, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetUrlInfoQuery(code), cancellationToken);
+            var result = await _mediator.Send(new GetUrlInfoQuery(code, Request.Scheme, Request.Host.ToString()), cancellationToken);
 
             if (result is null)
                 return NotFound();
