@@ -1,7 +1,7 @@
-﻿using LinkShortener.Application.DTOs.GetUrlInfo;
+﻿using LinkShortener.Application.DTOs;
 using MediatR;
 
 namespace LinkShortener.Application.Features.GetUrlInfo
 {
-    public record GetUrlInfoQuery(string Code, string Scheme, string Host) : IRequest<GetUrlInfoResponse?>;
+    public record GetUrlInfoQuery(string Code) : IRequest<ShortenUrlResponse?>;
 }

@@ -5,10 +5,16 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace LinkShortener.Infrastructure.Repositories
 {
-    public class UrlRepository(ApplicationDbContext context, IMemoryCache cache) : IUrlRepository
+    public class UrlRepository : IUrlRepository
     {
-        private readonly ApplicationDbContext _context = context;
-        private readonly IMemoryCache _cache = cache;
+        private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
+
+        public UrlRepository(ApplicationDbContext context, IMemoryCache cache)
+        {
+            _context = context;
+            _cache = cache;
+        }
 
         public async Task<ShortenedUrl?> GetByCodeAsync(string code, CancellationToken cancellationToken)
         {
