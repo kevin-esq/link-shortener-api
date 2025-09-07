@@ -1,18 +1,24 @@
-﻿using LinkShortener.Application.Abstractions;
-using LinkShortener.Application.DTOs.ShortenUrl;
+﻿// Application/Features/ShortenUrl/ShortenUrlHandler.cs
+using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.DTOs;
 using LinkShortener.Application.Features.ShortenUrl.LinkShortener.Application.Features.ShortenUrl;
 using LinkShortener.Domain.Entities;
 using MediatR;
 
 namespace LinkShortener.Application.Features.ShortenUrl
 {
-    public class ShortenUrlCommandHandler(IUrlRepository repository) : IRequestHandler<ShortenUrlCommand, ShortenUrlResponse>
+    public class ShortenUrlCommandHandler : IRequestHandler<ShortenUrlCommand, ShortenUrlResponse>
     {
-        private readonly IUrlRepository _repository = repository;
+        private readonly IUrlRepository _repository;
+
+        public ShortenUrlCommandHandler(IUrlRepository repository)
+        {
+            _repository = repository;
+        }
 
         public async Task<ShortenUrlResponse> Handle(ShortenUrlCommand request, CancellationToken cancellationToken)
         {
-            if (!Uri.TryCreate(request.OriginalUrl, UriKind.Absolute, out _))
+            if (!Uri.TryCreate(request.Url, UriKind.Absolute, out _))
                 throw new ArgumentException("Invalid URL");
 
             string code;
@@ -26,7 +32,7 @@ namespace LinkShortener.Application.Features.ShortenUrl
             var entity = new ShortenedUrl
             {
                 Id = Guid.NewGuid(),
-                LongUrl = request.OriginalUrl,
+                LongUrl = request.Url,
                 Code = code,
                 ShortUrl = $"{request.Scheme}://{request.Host}/s/{code}",
                 CreateOnUtc = DateTime.UtcNow
