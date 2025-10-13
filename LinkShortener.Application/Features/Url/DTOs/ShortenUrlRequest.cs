@@ -1,4 +1,4 @@
-﻿namespace LinkShortener.Application.DTOs.ShortenUrl
+﻿namespace LinkShortener.Application.Features.Url.DTOs
 {
     public class ShortenUrlRequest
     {

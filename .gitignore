@@ -1,4 +1,8 @@
-# Visual Studio user-specific files
+# ======================================
+# 🧩 VISUAL STUDIO / .NET STANDARD IGNORES
+# ======================================
+
+# User-specific files
 .vs/
 *.suo
 *.user
@@ -20,15 +24,16 @@ out/
 *.Backup
 *.swp
 
-# Local configuration files
+# Local configuration files (avoid secrets)
 *.local.json
 appsettings.Development.json
+appsettings.*.local.json
 
-# Rider/Resharper cache and settings
+# Rider / Resharper
 .idea/
 *.DotSettings.user
 
-# Test results and code coverage
+# Test results and coverage
 TestResult*/
 coverage*/
 *.coverage
@@ -42,13 +47,19 @@ publish/
 # Visual Studio generated files
 Generated\ Files/
 
-# Operating system files
+# OS generated files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Project-specific ignores
+# ======================================
+# 🧱 PROJECT-SPECIFIC IGNORES
+# ======================================
+
+# Root-level VS folder
 /.vs
+
+# Build artifacts
 *.vsidx
 /link-shortener/bin
 /link-shortener/obj
@@ -57,3 +68,43 @@ link-shortener/obj/Debug/net8.0/link-shortener.AssemblyInfo.cs
 link-shortener/obj/Debug/net8.0/link-shortener.AssemblyInfoInputs.cache
 link-shortener/obj/Debug/net8.0/link-shortener.assets.cache
 link-shortener/obj/Debug/net8.0/link-shortener.GeneratedMSBuildEditorConfig.editorconfig
+
+# ======================================
+# 🔒 SECURITY: IGNORE RSA KEYS & SECRETS
+# ======================================
+
+# PEM keys (private/public)
+*.pem
+*.key
+*.crt
+*.pfx
+
+# Specific RSA keys for LinkShortener
+LinkShortener.Application/Abstractions/Security/Keys/
+**/Keys/
+**/keys/
+**/secrets/
+**/private.pem
+**/public.pem
+
+# ======================================
+# 🧰 TOOLING / ENVIRONMENT
+# ======================================
+
+# VS Code settings
+.vscode/
+
+# Docker / Environment
+.env
+.env.*
+docker-compose.override.yml
+
+# ======================================
+# 🧼 MISC CLEANUP
+# ======================================
+
+# Backups and temporary exports
+*.bak
+*.tmp
+*.old
+*.orig

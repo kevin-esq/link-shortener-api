@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkShortener.Api", "LinkSh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkShortener.Tests", "LinkShortener.Tests\LinkShortener.Tests.csproj", "{E4FF7A6D-E614-40A3-AE7D-4128D281CC4F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyGenerator", "KeyGenerator\KeyGenerator.csproj", "{E5508830-152A-4D92-ACDD-E64CFCFBF23A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E4FF7A6D-E614-40A3-AE7D-4128D281CC4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4FF7A6D-E614-40A3-AE7D-4128D281CC4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4FF7A6D-E614-40A3-AE7D-4128D281CC4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5508830-152A-4D92-ACDD-E64CFCFBF23A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5508830-152A-4D92-ACDD-E64CFCFBF23A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5508830-152A-4D92-ACDD-E64CFCFBF23A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5508830-152A-4D92-ACDD-E64CFCFBF23A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
