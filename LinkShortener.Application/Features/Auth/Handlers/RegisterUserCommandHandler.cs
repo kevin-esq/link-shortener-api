@@ -61,7 +61,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
                     TimeSpan.FromMinutes(CODE_EXPIRATION_MINUTES),
                     cancellationToken);
 
-                var emailBody = BuildVerificationEmailBody(user.Username, verificationCode);
+                var emailBody = BuildVerificationEmailBody(verificationCode);
 
                 await _emailService.SendAsync(
                     user.Email,
@@ -91,31 +91,11 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             return number.ToString();
         }
 
-        private static string BuildVerificationEmailBody(string username, string code)
+        private static string BuildVerificationEmailBody(string code)
         {
-            return $@"
-                <html>
-                <body style='font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;'>
-                    <div style='max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                        <h2 style='color: #333; margin-bottom: 20px;'>Welcome to LinkShortener, {username}!</h2>
-                        <p style='color: #666; font-size: 16px; line-height: 1.5;'>
-                            Thank you for registering. To complete your registration and start using your account, 
-                            please verify your email address using the code below:
-                        </p>
-                        <div style='background-color: #f0f7ff; padding: 20px; border-radius: 5px; text-align: center; margin: 25px 0;'>
-                            <p style='margin: 0; font-size: 14px; color: #666; margin-bottom: 10px;'>Your verification code is:</p>
-                            <p style='margin: 0; font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 5px;'>{code}</p>
-                        </div>
-                        <p style='color: #999; font-size: 14px; margin-top: 20px;'>
-                            This code will expire in {CODE_EXPIRATION_MINUTES} minutes.
-                        </p>
-                        <p style='color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;'>
-                            If you didn't create an account with LinkShortener, please ignore this email.
-                        </p>
-                    </div>
-                </body>
-                </html>
-            ";
+            var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HTMLTemplates", "VerifyEmailTemplate.html");
+            var template = File.ReadAllText(templatePath);
+            return template.Replace("{{CODE}}", code);
         }
     }
 }
