@@ -4,8 +4,10 @@ namespace LinkShortener.Application.Abstractions
 {
     public interface IUrlRepository
     {
-        Task<ShortenedUrl?> GetByCodeAsync(string code, CancellationToken cancellationToken);
-        Task AddAsync(ShortenedUrl url, CancellationToken cancellationToken);
+        Task<Link?> GetByCodeAsync(string code, CancellationToken cancellationToken);
+        Task<Link?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task AddAsync(Link link, CancellationToken cancellationToken);
+        Task AddAccessAsync(LinkAccess access, CancellationToken cancellationToken);
         Task SaveChangesAsync(CancellationToken cancellationToken);
         Task<bool> IsUnique(string code, CancellationToken cancellationToken);
     }

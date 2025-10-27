@@ -1,5 +1,9 @@
-﻿using LinkShortener.Application.Features.ShortenUrl;
-using LinkShortener.Application.Features.ShortenUrl.LinkShortener.Application.Features.ShortenUrl;
+﻿using LinkShortener.Application.Features.Url.Commands;
+using LinkShortener.Application.Features.Url.Handlers;
+using Xunit;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LinkShortener.Tests.UnitTests.Handlers
 {
@@ -12,11 +16,13 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var mockRepo = Helpers.MockRepository.CreateDefault();
             var handler = new ShortenUrlCommandHandler(mockRepo.Object);
 
+            var userId = Guid.NewGuid();
             var command = new ShortenUrlCommand(
                 "https://example.com?param1=value1&param2=value2?param3=value3",
                 "https",
-                "localhost:7205"
-                );
+                "localhost:7205",
+                userId
+            );
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -35,10 +41,12 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var mockRepo = Helpers.MockRepository.CreateDefault();
             var handler = new ShortenUrlCommandHandler(mockRepo.Object);
 
+            var userId = Guid.NewGuid();
             var command = new ShortenUrlCommand(
                 "not-a-url",
                 "https",
-                "localhost:7205"
+                "localhost:7205",
+                userId
             );
 
             // Act & Assert
