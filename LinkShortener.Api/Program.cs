@@ -114,6 +114,7 @@ builder.Services.AddScoped<IUrlRepository, UrlRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddSingleton<IJwtService>(new JwtService(
     privateKey,

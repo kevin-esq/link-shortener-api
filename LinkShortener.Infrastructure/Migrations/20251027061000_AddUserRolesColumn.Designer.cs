@@ -4,6 +4,7 @@ using LinkShortener.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LinkShortener.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027061000_AddUserRolesColumn")]
+    partial class AddUserRolesColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,6 +89,8 @@ namespace LinkShortener.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LinkId");
 
                     b.HasIndex("UserId");
 
@@ -264,7 +269,7 @@ namespace LinkShortener.Infrastructure.Migrations
             modelBuilder.Entity("LinkShortener.Domain.Entities.Link", b =>
                 {
                     b.HasOne("LinkShortener.Domain.Entities.User", "User")
-                        .WithMany("_links")
+                        .WithMany("Links")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -274,10 +279,18 @@ namespace LinkShortener.Infrastructure.Migrations
 
             modelBuilder.Entity("LinkShortener.Domain.Entities.LinkAccess", b =>
                 {
+                    b.HasOne("LinkShortener.Domain.Entities.Link", "Link")
+                        .WithMany("Accesses")
+                        .HasForeignKey("LinkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("LinkShortener.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Link");
 
                     b.Navigation("User");
                 });
@@ -304,9 +317,14 @@ namespace LinkShortener.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LinkShortener.Domain.Entities.Link", b =>
+                {
+                    b.Navigation("Accesses");
+                });
+
             modelBuilder.Entity("LinkShortener.Domain.Entities.User", b =>
                 {
-                    b.Navigation("_links");
+                    b.Navigation("Links");
                 });
 #pragma warning restore 612, 618
         }

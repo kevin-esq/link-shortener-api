@@ -84,6 +84,34 @@ namespace LinkShortener.Infrastructure
 
                 builder.HasIndex(u => new { u.Email, u.AuthProvider })
                        .IsUnique();
+
+                var rolesValueComparer = new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<UserRole>>(
+                    (c1, c2) => c1!.SequenceEqual(c2!),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList());
+
+                var rolesProperty = builder.Property<List<UserRole>>("_roles")
+                       .HasColumnName("Roles")
+                       .HasConversion(
+                           v => string.Join(',', v.Select(r => r.ToString())),
+                           v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                 .Select(r => Enum.Parse<UserRole>(r))
+                                 .ToList())
+                       .Metadata;
+                
+                rolesProperty.SetValueComparer(rolesValueComparer);
+                rolesProperty.SetField("_roles");
+
+                builder.HasMany<Link>("_links")
+                       .WithOne(l => l.User)
+                       .HasForeignKey(l => l.UserId)
+                       .OnDelete(DeleteBehavior.Restrict);
+
+                builder.Navigation("_links")
+                       .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+                builder.Ignore(u => u.Links);
+                builder.Ignore(u => u.Roles);
             });
         }
 
@@ -112,15 +140,15 @@ namespace LinkShortener.Infrastructure
                 builder.HasIndex(l => l.Code)
                        .IsUnique();
 
-                builder.HasOne(l => l.User)
-                       .WithMany(u => u.Links)
-                       .HasForeignKey(l => l.UserId)
-                       .OnDelete(DeleteBehavior.Restrict);
-
-                builder.HasMany(l => l.Accesses)
+                builder.HasMany<LinkAccess>("_accesses")
                        .WithOne(a => a.Link)
                        .HasForeignKey(a => a.LinkId)
                        .OnDelete(DeleteBehavior.Cascade);
+
+                builder.Navigation("_accesses")
+                       .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+                builder.Ignore(l => l.Accesses);
             });
         }
 
@@ -142,10 +170,7 @@ namespace LinkShortener.Infrastructure
                        .IsRequired()
                        .HasColumnType("datetime2");
 
-                builder.HasOne(a => a.Link)
-                       .WithMany(l => l.Accesses)
-                       .HasForeignKey(a => a.LinkId)
-                       .OnDelete(DeleteBehavior.Cascade);
+                builder.Ignore(a => a.Link);
 
                 builder.HasOne(a => a.User)
                        .WithMany()

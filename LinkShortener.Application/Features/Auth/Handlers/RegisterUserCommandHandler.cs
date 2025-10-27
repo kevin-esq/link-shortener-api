@@ -1,12 +1,13 @@
 using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Abstractions.Services;
+using LinkShortener.Application.Common.Validators;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using LinkShortener.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
@@ -15,6 +16,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
         private readonly IUserRepository _repository;
         private readonly IEmailService _emailService;
         private readonly IVerificationCodeStore _codeStore;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly ILogger<RegisterUserCommandHandler> _logger;
         private const int CODE_EXPIRATION_MINUTES = 10;
         private const int CODE_MIN = 100000;
@@ -24,11 +26,13 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             IUserRepository repository,
             IEmailService emailService,
             IVerificationCodeStore codeStore,
+            IPasswordHasher passwordHasher,
             ILogger<RegisterUserCommandHandler> logger)
         {
             _repository = repository;
             _emailService = emailService;
             _codeStore = codeStore;
+            _passwordHasher = passwordHasher;
             _logger = logger;
         }
 
@@ -37,7 +41,11 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             if (await _repository.ExistsByEmailAsync(request.Email, cancellationToken))
                 throw new ArgumentException("Email already registered");
 
-            var passwordHash = HashPassword(request.Password);
+            var (isValid, errorMessage) = PasswordValidator.Validate(request.Password);
+            if (!isValid)
+                throw new ArgumentException(errorMessage);
+
+            var passwordHash = _passwordHasher.HashPassword(request.Password);
             var user = User.Create(request.Username, request.Email, passwordHash);
 
             await _repository.AddAsync(user, cancellationToken);
@@ -76,13 +84,6 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             return new RegisterUserResponse(user.Id, user.Username, user.Email, user.IsEmailVerified);
         }
 
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
 
         private static string GenerateSecureCode()
         {
