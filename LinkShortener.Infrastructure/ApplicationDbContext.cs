@@ -1,4 +1,4 @@
-﻿using LinkShortener.Domain.Entities;
+using LinkShortener.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LinkShortener.Infrastructure
@@ -13,6 +13,8 @@ namespace LinkShortener.Infrastructure
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Link> Links { get; set; } = null!;
         public DbSet<LinkAccess> LinkAccesses { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<Session> Sessions { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +23,8 @@ namespace LinkShortener.Infrastructure
             ConfigureUserEntity(modelBuilder);
             ConfigureLinkEntity(modelBuilder);
             ConfigureLinkAccessEntity(modelBuilder);
+            ConfigureRefreshTokenEntity(modelBuilder);
+            ConfigureSessionEntity(modelBuilder);
         }
 
         private static void ConfigureUserEntity(ModelBuilder modelBuilder)
@@ -46,6 +50,40 @@ namespace LinkShortener.Infrastructure
 
                 builder.Property(u => u.IsActive)
                        .IsRequired();
+
+                builder.Property(u => u.IsEmailVerified)
+                       .IsRequired()
+                       .HasDefaultValue(false);
+
+                builder.Property(u => u.EmailVerifiedAt)
+                       .IsRequired(false)
+                       .HasColumnType("datetime2");
+
+                builder.Property(u => u.AuthProvider)
+                       .IsRequired()
+                       .HasConversion<string>()
+                       .HasMaxLength(20);
+
+                builder.Property(u => u.ExternalProviderId)
+                       .IsRequired(false)
+                       .HasMaxLength(255);
+
+                builder.Property(u => u.Status)
+                       .IsRequired()
+                       .HasConversion<string>()
+                       .HasMaxLength(30);
+
+                builder.Property(u => u.SuspendedAt)
+                       .HasColumnType("datetime2");
+
+                builder.Property(u => u.SuspensionReason)
+                       .HasMaxLength(500);
+
+                builder.Property(u => u.LastLoginAt)
+                       .HasColumnType("datetime2");
+
+                builder.HasIndex(u => new { u.Email, u.AuthProvider })
+                       .IsUnique();
             });
         }
 
@@ -113,6 +151,98 @@ namespace LinkShortener.Infrastructure
                        .WithMany()
                        .HasForeignKey(a => a.UserId)
                        .OnDelete(DeleteBehavior.SetNull);
+            });
+        }
+
+        private static void ConfigureRefreshTokenEntity(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RefreshToken>(builder =>
+            {
+                builder.HasKey(rt => rt.Id);
+
+                builder.Property(rt => rt.Token)
+                       .IsRequired()
+                       .HasMaxLength(500);
+
+                builder.Property(rt => rt.CreatedAt)
+                       .IsRequired()
+                       .HasColumnType("datetime2");
+
+                builder.Property(rt => rt.ExpiresAt)
+                       .IsRequired()
+                       .HasColumnType("datetime2");
+
+                builder.Property(rt => rt.IsRevoked)
+                       .IsRequired();
+
+                builder.Property(rt => rt.IsUsed)
+                       .IsRequired();
+
+                builder.Property(rt => rt.RevokedAt)
+                       .HasColumnType("datetime2");
+
+                builder.Property(rt => rt.UsedAt)
+                       .HasColumnType("datetime2");
+
+                builder.Property(rt => rt.ReplacedByToken)
+                       .HasMaxLength(500);
+
+                builder.HasIndex(rt => rt.Token)
+                       .IsUnique();
+
+                builder.HasIndex(rt => rt.UserId);
+
+                builder.HasOne(rt => rt.User)
+                       .WithMany()
+                       .HasForeignKey(rt => rt.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        private static void ConfigureSessionEntity(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Session>(builder =>
+            {
+                builder.HasKey(s => s.Id);
+
+                builder.Property(s => s.IpAddress)
+                       .IsRequired()
+                       .HasMaxLength(45);
+
+                builder.Property(s => s.UserAgent)
+                       .IsRequired()
+                       .HasMaxLength(500);
+
+                builder.Property(s => s.DeviceName)
+                       .HasMaxLength(200);
+
+                builder.Property(s => s.Location)
+                       .HasMaxLength(200);
+
+                builder.Property(s => s.CreatedAt)
+                       .IsRequired()
+                       .HasColumnType("datetime2");
+
+                builder.Property(s => s.LastActivityAt)
+                       .IsRequired()
+                       .HasColumnType("datetime2");
+
+                builder.Property(s => s.EndedAt)
+                       .HasColumnType("datetime2");
+
+                builder.Property(s => s.IsActive)
+                       .IsRequired();
+
+                builder.Property(s => s.RefreshTokenId)
+                       .HasMaxLength(100);
+
+                builder.HasIndex(s => s.UserId);
+                builder.HasIndex(s => new { s.UserId, s.IsActive });
+
+                builder.HasOne(s => s.User)
+                       .WithMany()
+                       .HasForeignKey(s => s.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

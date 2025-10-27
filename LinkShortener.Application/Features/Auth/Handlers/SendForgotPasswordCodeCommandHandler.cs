@@ -1,4 +1,4 @@
-﻿using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
 using MediatR;
@@ -6,9 +6,6 @@ using System.Security.Cryptography;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    /// <summary>
-    /// Handles sending a verification code for the forgot password process.
-    /// </summary>
     public class SendForgotPasswordCodeCommandHandler : IRequestHandler<SendForgotPasswordCodeCommand>
     {
         private readonly IUserRepository _repository;

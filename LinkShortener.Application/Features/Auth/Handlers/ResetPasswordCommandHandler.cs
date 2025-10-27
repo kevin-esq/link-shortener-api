@@ -1,4 +1,4 @@
-﻿using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
 using MediatR;
@@ -7,9 +7,6 @@ using System.Text;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    /// <summary>
-    /// Handles password reset requests after verifying the code.
-    /// </summary>
     public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
     {
         private readonly IUserRepository _repository;
