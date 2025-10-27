@@ -3,9 +3,7 @@ using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using LinkShortener.Domain.Entities;
-using System.Security.Cryptography;
 using MediatR;
-using System.Text;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
@@ -15,17 +13,20 @@ namespace LinkShortener.Application.Features.Auth.Handlers
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly ISessionRepository _sessionRepository;
         private readonly IJwtService _tokenService;
+        private readonly IPasswordHasher _passwordHasher;
 
         public LoginUserCommandHandler(
             IUserRepository repository,
             IRefreshTokenRepository refreshTokenRepository,
             ISessionRepository sessionRepository,
-            IJwtService tokenService)
+            IJwtService tokenService,
+            IPasswordHasher passwordHasher)
         {
             _repository = repository;
             _refreshTokenRepository = refreshTokenRepository;
             _sessionRepository = sessionRepository;
             _tokenService = tokenService;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<LoginUserResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -34,8 +35,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             if (user == null)
                 throw new ArgumentException("Invalid email or password");
 
-            var passwordHash = HashPassword(request.Password);
-            if (user.PasswordHash != passwordHash)
+            if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
                 throw new ArgumentException("Invalid email or password");
 
             if (!user.CanLogin)
@@ -72,12 +72,5 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             return new LoginUserResponse(user.Id, user.Username, user.Email, token, refreshToken);
         }
 
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
     }
 }
