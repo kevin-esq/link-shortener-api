@@ -26,6 +26,9 @@
 		<None Update="HTMLTemplates\ForgotPasswordEmailTemplate.html">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="HTMLTemplates\VerifyEmailTemplate.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>
