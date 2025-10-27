@@ -46,7 +46,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             try
             {
                 var verificationCode = GenerateSecureCode();
-                
+
                 await _codeStore.SaveCodeAsync(
                     user.Email,
                     verificationCode,

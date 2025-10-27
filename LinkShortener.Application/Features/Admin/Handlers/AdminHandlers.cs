@@ -18,7 +18,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
         public async Task<List<UserListResponse>> Handle(GetAllUsersQuery request, CancellationToken ct)
         {
             var users = await _userRepository.GetAllAsync(request.Page, request.PageSize, ct);
-            
+
             return users.Select(u => new UserListResponse(
                 u.Id,
                 u.Username,
@@ -123,7 +123,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
                 throw new KeyNotFoundException($"User not found: {request.UserId}");
 
             user.Ban(request.Reason);
-            
+
             await _sessionRepository.EndAllUserSessionsAsync(request.UserId, ct);
             await _refreshTokenRepository.RevokeAllUserTokensAsync(request.UserId, ct);
             await _userRepository.SaveChangesAsync(ct);
@@ -220,7 +220,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
         public async Task<List<SessionResponse>> Handle(GetUserSessionsQuery request, CancellationToken ct)
         {
             var sessions = await _sessionRepository.GetAllByUserIdAsync(request.UserId, ct);
-            
+
             return sessions.Select(s => new SessionResponse(
                 s.Id,
                 s.IpAddress,

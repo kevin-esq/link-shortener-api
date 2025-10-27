@@ -30,7 +30,7 @@ namespace LinkShortener.Api.Attributes
                 .Select(c => c.Value)
                 .ToList();
 
-            var hasRequiredRole = _roles.Any(role => 
+            var hasRequiredRole = _roles.Any(role =>
                 userRoles.Contains(role.ToString()));
 
             if (!hasRequiredRole)
