@@ -1,13 +1,9 @@
-﻿using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
 using MediatR;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    /// <summary>
-    /// Handles verification of forgot password codes.
-    /// </summary>
     public class VerifyForgotPasswordCodeCommandHandler : IRequestHandler<VerifyForgotPasswordCodeCommand, bool>
     {
         private readonly IVerificationCodeStore _codeStore;

@@ -1,4 +1,5 @@
-﻿using LinkShortener.Application.Abstractions;
+using LinkShortener.Api.Middleware;
+using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Url.Handlers;
@@ -111,6 +112,8 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddScoped<IUrlRepository, UrlRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 builder.Services.AddSingleton<IJwtService>(new JwtService(
     privateKey,
@@ -130,9 +133,8 @@ builder.Services.AddSingleton<IJwtValidator>(new JwtValidator(new TokenValidatio
 }));
 
 builder.Services.AddMemoryCache();
-var emailConfig = builder.Configuration.GetSection("Email");
 
-builder.Services.AddSingleton<IVerificationCodeStore, VerificationCodeStore>();
+var emailConfig = builder.Configuration.GetSection("Email");
 builder.Services.AddSingleton<IEmailService>(new EmailService(
     host: emailConfig["Host"]!,
     port: int.Parse(emailConfig["Port"]!),
@@ -141,11 +143,20 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
     fromAddress: emailConfig["FromAddress"]!
 ));
 
+builder.Services.AddSingleton<IVerificationCodeStore, VerificationCodeStore>();
+
+var googleClientId = builder.Configuration["Google:ClientId"] 
+    ?? throw new InvalidOperationException("Missing Google:ClientId configuration");
+builder.Services.AddSingleton<IGoogleAuthService>(sp => 
+    new GoogleAuthService(googleClientId, sp.GetRequiredService<ILogger<GoogleAuthService>>()));
+
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(ShortenUrlCommandHandler).Assembly)
 );
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

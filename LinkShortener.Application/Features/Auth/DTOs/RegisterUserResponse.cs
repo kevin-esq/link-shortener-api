@@ -1,4 +1,4 @@
-﻿namespace LinkShortener.Application.Features.Auth.DTOs
+namespace LinkShortener.Application.Features.Auth.DTOs
 {
-    public record RegisterUserResponse(Guid UserId, string Username, string Email);
+    public record RegisterUserResponse(Guid UserId, string Username, string Email, bool IsEmailVerified);
 }
