@@ -54,11 +54,11 @@ namespace LinkShortener.Application.Features.Auth.Handlers
                     TimeSpan.FromMinutes(CODE_EXPIRATION_MINUTES),
                     ct);
 
-                var body = BuildEmailBody(code);
+                var body = await LoadEmailTemplateAsync(code);
 
                 await _emailService.SendAsync(
                     request.Email,
-                    "Verify your email",
+                    "Verify your email - Link Shortener",
                     body,
                     isHtml: true
                     );
@@ -82,31 +82,11 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             return number.ToString();
         }
 
-        private static string BuildEmailBody(string code)
+        private static async Task<string> LoadEmailTemplateAsync(string code)
         {
-            return $@"
-                <html>
-                <body style='font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;'>
-                    <div style='max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                        <h2 style='color: #333; margin-bottom: 20px;'>Email Verification</h2>
-                        <p style='color: #666; font-size: 16px; line-height: 1.5;'>
-                            You requested a verification code for your LinkShortener account.
-                            Please use the code below to verify your email:
-                        </p>
-                        <div style='background-color: #f0f7ff; padding: 20px; border-radius: 5px; text-align: center; margin: 25px 0;'>
-                            <p style='margin: 0; font-size: 14px; color: #666; margin-bottom: 10px;'>Your verification code is:</p>
-                            <p style='margin: 0; font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 5px;'>{code}</p>
-                        </div>
-                        <p style='color: #999; font-size: 14px; margin-top: 20px;'>
-                            This code will expire in {CODE_EXPIRATION_MINUTES} minutes.
-                        </p>
-                        <p style='color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;'>
-                            If you didn't request this code, please ignore this email.
-                        </p>
-                    </div>
-                </body>
-                </html>
-            ";
+            var templatePath = Path.Combine(AppContext.BaseDirectory, "HTMLTemplates", "VerifyEmailTemplate.html");
+            var template = await File.ReadAllTextAsync(templatePath);
+            return template.Replace("{{CODE}}", code);
         }
     }
 }
