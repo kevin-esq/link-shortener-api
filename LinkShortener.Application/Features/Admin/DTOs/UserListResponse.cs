@@ -31,9 +31,9 @@ namespace LinkShortener.Application.Features.Admin.DTOs
         int TotalLinksCreated);
 
     public record SuspendUserRequest(string Reason);
-    
+
     public record BanUserRequest(string Reason);
-    
+
     public record SessionResponse(
         Guid SessionId,
         string IpAddress,

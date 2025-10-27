@@ -56,8 +56,8 @@ namespace LinkShortener.Domain.Entities
             RefreshTokenId = refreshTokenId;
         }
 
-        public TimeSpan Duration => EndedAt.HasValue 
-            ? EndedAt.Value - CreatedAt 
+        public TimeSpan Duration => EndedAt.HasValue
+            ? EndedAt.Value - CreatedAt
             : DateTime.UtcNow - CreatedAt;
     }
 }

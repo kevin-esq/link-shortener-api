@@ -145,9 +145,9 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
 
 builder.Services.AddSingleton<IVerificationCodeStore, VerificationCodeStore>();
 
-var googleClientId = builder.Configuration["Google:ClientId"] 
+var googleClientId = builder.Configuration["Google:ClientId"]
     ?? throw new InvalidOperationException("Missing Google:ClientId configuration");
-builder.Services.AddSingleton<IGoogleAuthService>(sp => 
+builder.Services.AddSingleton<IGoogleAuthService>(sp =>
     new GoogleAuthService(googleClientId, sp.GetRequiredService<ILogger<GoogleAuthService>>()));
 
 builder.Services.AddMediatR(cfg =>
