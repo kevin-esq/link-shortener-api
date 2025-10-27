@@ -1,5 +1,6 @@
 ﻿using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Security;
+using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Url.Handlers;
 using LinkShortener.Infrastructure;
 using LinkShortener.Infrastructure.Repositories;
@@ -7,6 +8,7 @@ using LinkShortener.Infrastructure.Security;
 using LinkShortener.Infrastructure.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -128,6 +130,16 @@ builder.Services.AddSingleton<IJwtValidator>(new JwtValidator(new TokenValidatio
 }));
 
 builder.Services.AddMemoryCache();
+var emailConfig = builder.Configuration.GetSection("Email");
+
+builder.Services.AddSingleton<IVerificationCodeStore, VerificationCodeStore>();
+builder.Services.AddSingleton<IEmailService>(new EmailService(
+    host: emailConfig["Host"]!,
+    port: int.Parse(emailConfig["Port"]!),
+    username: emailConfig["Username"]!,
+    password: emailConfig["Password"]!,
+    fromAddress: emailConfig["FromAddress"]!
+));
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(ShortenUrlCommandHandler).Assembly)
