@@ -17,6 +17,7 @@ namespace LinkShortener.Infrastructure.Repositories
         {
             return await _context.Users
                 .Include(u => u.Links)
+                .Include(u => u.UserRoles)
                 .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         }
 
@@ -24,6 +25,7 @@ namespace LinkShortener.Infrastructure.Repositories
         {
             return await _context.Users
                 .Include(u => u.Links)
+                .Include(u => u.UserRoles)
                 .FirstOrDefaultAsync(u => u.Email == email.ToLowerInvariant(), cancellationToken);
         }
 
@@ -31,6 +33,7 @@ namespace LinkShortener.Infrastructure.Repositories
         {
             return await _context.Users
                 .Include(u => u.Links)
+                .Include(u => u.UserRoles)
                 .OrderByDescending(u => u.CreatedOnUtc)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

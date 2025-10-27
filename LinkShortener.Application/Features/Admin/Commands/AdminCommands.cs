@@ -14,9 +14,9 @@ namespace LinkShortener.Application.Features.Admin.Commands
 
     public record UnsuspendUserCommand(Guid UserId) : IRequest<Unit>;
 
-    public record AddRoleCommand(Guid UserId, UserRole Role) : IRequest<Unit>;
+    public record AddRoleCommand(Guid UserId, Role Role) : IRequest<Unit>;
 
-    public record RemoveRoleCommand(Guid UserId, UserRole Role) : IRequest<Unit>;
+    public record RemoveRoleCommand(Guid UserId, Role Role) : IRequest<Unit>;
 
     public record GetUserSessionsQuery(Guid UserId) : IRequest<List<SessionResponse>>;
 

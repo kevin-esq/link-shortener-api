@@ -4,6 +4,7 @@ using LinkShortener.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LinkShortener.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027064137_RestorePublicNavigationProperties")]
+    partial class RestorePublicNavigationProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,42 +253,17 @@ namespace LinkShortener.Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("_roles")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Roles");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email", "AuthProvider")
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("LinkShortener.Domain.Entities.UserRole", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("GrantedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("GrantedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GrantedBy");
-
-                    b.HasIndex("UserId", "Role")
-                        .IsUnique();
-
-                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("LinkShortener.Domain.Entities.Link", b =>
@@ -339,24 +317,6 @@ namespace LinkShortener.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LinkShortener.Domain.Entities.UserRole", b =>
-                {
-                    b.HasOne("LinkShortener.Domain.Entities.User", "GrantedByUser")
-                        .WithMany()
-                        .HasForeignKey("GrantedBy")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("LinkShortener.Domain.Entities.User", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GrantedByUser");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("LinkShortener.Domain.Entities.Link", b =>
                 {
                     b.Navigation("Accesses");
@@ -365,8 +325,6 @@ namespace LinkShortener.Infrastructure.Migrations
             modelBuilder.Entity("LinkShortener.Domain.Entities.User", b =>
                 {
                     b.Navigation("Links");
-
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }
