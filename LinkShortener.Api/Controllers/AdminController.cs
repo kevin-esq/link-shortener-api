@@ -12,7 +12,7 @@ namespace LinkShortener.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    [RequireRole(UserRole.Admin)]
+    [RequireRole(Role.Admin)]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -87,7 +87,7 @@ namespace LinkShortener.Api.Controllers
         [HttpPost("users/{userId}/roles/{role}")]
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ErrorDetails), 404)]
-        public async Task<IActionResult> AddRole(Guid userId, UserRole role, CancellationToken ct)
+        public async Task<IActionResult> AddRole(Guid userId, Role role, CancellationToken ct)
         {
             await _mediator.Send(new AddRoleCommand(userId, role), ct);
             return Ok(ApiResponse.SuccessResponse($"Role {role} added successfully"));
@@ -99,7 +99,7 @@ namespace LinkShortener.Api.Controllers
         [HttpDelete("users/{userId}/roles/{role}")]
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ErrorDetails), 404)]
-        public async Task<IActionResult> RemoveRole(Guid userId, UserRole role, CancellationToken ct)
+        public async Task<IActionResult> RemoveRole(Guid userId, Role role, CancellationToken ct)
         {
             await _mediator.Send(new RemoveRoleCommand(userId, role), ct);
             return Ok(ApiResponse.SuccessResponse($"Role {role} removed successfully"));

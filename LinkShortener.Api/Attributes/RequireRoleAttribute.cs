@@ -8,9 +8,9 @@ namespace LinkShortener.Api.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequireRoleAttribute : Attribute, IAuthorizationFilter
     {
-        private readonly UserRole[] _roles;
+        private readonly Role[] _roles;
 
-        public RequireRoleAttribute(params UserRole[] roles)
+        public RequireRoleAttribute(params Role[] roles)
         {
             _roles = roles;
         }
