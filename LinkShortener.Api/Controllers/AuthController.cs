@@ -1,6 +1,7 @@
 ﻿using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkShortener.Api.Controllers
@@ -99,6 +100,47 @@ namespace LinkShortener.Api.Controllers
                 cancellationToken);
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Sends a password reset code to the user's email.
+        /// </summary>
+        /// <param name="email">Registered user email.</param>
+        /// <response code="200">If the code was sent successfully.</response>
+        /// <response code="404">If the email is not registered.</response>
+        [HttpGet("forgot-password/code")]
+        public async Task<IActionResult> SendForgotPasswordCode([FromQuery] string email, CancellationToken cancellationToken)
+        {
+            await _mediator.Send(new SendForgotPasswordCodeCommand(email), cancellationToken);
+            return Ok(new { message = "Verification code sent to email." });
+        }
+
+        // 🔹 2️⃣ Verificar código
+        /// <summary>
+        /// Verifies the password reset code sent to the user's email.
+        /// </summary>
+        /// <param name="request">Contains email and code.</param>
+        /// <response code="200">If the code is valid.</response>
+        /// <response code="400">If the code is invalid or expired.</response>
+        [HttpPost("forgot-password/verify")]
+        public async Task<IActionResult> VerifyForgotPasswordCode([FromBody] VerifyForgotPasswordCodeRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new VerifyForgotPasswordCodeCommand(request.Email, request.Code), cancellationToken);
+            return Ok(result);
+        }
+
+        // 🔹 3️⃣ Resetear contraseña
+        /// <summary>
+        /// Resets the user's password after successful code verification.
+        /// </summary>
+        /// <param name="request">Contains email, code, and new password.</param>
+        /// <response code="200">If the password was successfully reset.</response>
+        /// <response code="400">If the code is invalid or expired.</response>
+        [HttpPost("forgot-password/reset")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+        {
+            await _mediator.Send(new ResetPasswordCommand(request.Email, request.ResetCode, request.NewPassword), cancellationToken);
+            return Ok(new { message = "Password successfully reset." });
         }
     }
 }
