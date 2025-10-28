@@ -65,7 +65,7 @@ namespace LinkShortener.Api.Controllers
                 cancellationToken);
 
             return Ok(ApiResponse<RegisterUserResponse>.SuccessResponse(
-                result, 
+                result,
                 "Registration successful. Please check your email for verification code."));
         }
 

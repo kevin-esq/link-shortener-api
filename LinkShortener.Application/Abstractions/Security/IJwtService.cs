@@ -5,7 +5,7 @@ namespace LinkShortener.Application.Abstractions.Security
 {
     public interface IJwtService
     {
-        string GenerateToken(Guid userId, string? email = null, IReadOnlyCollection<UserRole>? roles = null);
+        string GenerateToken(Guid userId, string? email = null, IReadOnlyCollection<Role>? roles = null);
 
         string GenerateRefreshToken();
 

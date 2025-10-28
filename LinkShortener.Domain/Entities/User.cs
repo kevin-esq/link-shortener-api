@@ -7,7 +7,7 @@ namespace LinkShortener.Domain.Entities
     {
         private User() { }
 
-        public static User Create(string username, string email, string passwordHash, IEnumerable<UserRole>? roles = null)
+        public static User Create(string username, string email, string passwordHash, IEnumerable<Role>? roles = null)
         {
             var user = new User
             {
@@ -27,17 +27,17 @@ namespace LinkShortener.Domain.Entities
             if (roles != null)
             {
                 foreach (var role in roles)
-                    user._roles.Add(role);
+                    user._userRoles.Add(UserRole.Create(user.Id, role));
             }
             else
             {
-                user._roles.Add(UserRole.User);
+                user._userRoles.Add(UserRole.Create(user.Id, Role.User));
             }
 
             return user;
         }
 
-        public static User CreateFromOAuth(string email, string username, AuthProvider provider, string externalId, IEnumerable<UserRole>? roles = null)
+        public static User CreateFromOAuth(string email, string username, AuthProvider provider, string externalId, IEnumerable<Role>? roles = null)
         {
             var user = new User
             {
@@ -57,18 +57,18 @@ namespace LinkShortener.Domain.Entities
             if (roles != null)
             {
                 foreach (var role in roles)
-                    user._roles.Add(role);
+                    user._userRoles.Add(UserRole.Create(user.Id, role));
             }
             else
             {
-                user._roles.Add(UserRole.User);
+                user._userRoles.Add(UserRole.Create(user.Id, Role.User));
             }
 
             return user;
         }
 
         private readonly List<Link> _links = new List<Link>();
-        private readonly List<UserRole> _roles = new List<UserRole>();
+        private readonly List<UserRole> _userRoles = new List<UserRole>();
 
         public string Username { get; private set; } = string.Empty;
         public string Email { get; private set; } = string.Empty;
@@ -85,7 +85,8 @@ namespace LinkShortener.Domain.Entities
         public DateTime? LastLoginAt { get; private set; }
 
         public IReadOnlyCollection<Link> Links => _links.AsReadOnly();
-        public IReadOnlyCollection<UserRole> Roles => _roles.AsReadOnly();
+        public IReadOnlyCollection<UserRole> UserRoles => _userRoles.AsReadOnly();
+        public IReadOnlyCollection<Role> Roles => _userRoles.Select(ur => ur.Role).ToList().AsReadOnly();
 
         #region Behavior
         public void Deactivate() => IsActive = false;
@@ -117,20 +118,22 @@ namespace LinkShortener.Domain.Entities
             LastLoginAt = DateTime.UtcNow;
         }
 
-        public void AddRole(UserRole role)
+        public void AddRole(Role role, Guid? grantedBy = null)
         {
-            if (!_roles.Contains(role))
-                _roles.Add(role);
+            if (!_userRoles.Any(ur => ur.Role == role))
+                _userRoles.Add(UserRole.Create(Id, role, grantedBy));
         }
 
-        public void RemoveRole(UserRole role)
+        public void RemoveRole(Role role)
         {
-            _roles.Remove(role);
+            var userRole = _userRoles.FirstOrDefault(ur => ur.Role == role);
+            if (userRole != null)
+                _userRoles.Remove(userRole);
         }
 
-        public bool HasRole(UserRole role) => _roles.Contains(role);
+        public bool HasRole(Role role) => _userRoles.Any(ur => ur.Role == role);
 
-        public bool IsAdmin => _roles.Contains(UserRole.Admin);
+        public bool IsAdmin => _userRoles.Any(ur => ur.Role == Role.Admin);
 
         public bool CanLogin => IsActive && Status == UserStatus.Active && IsEmailVerified;
 
@@ -199,13 +202,6 @@ namespace LinkShortener.Domain.Entities
             return passwordHash;
         }
         #endregion
-    }
-
-    public enum UserRole
-    {
-        User,
-        Premium,
-        Admin
     }
 
     public enum AuthProvider

@@ -26,6 +26,7 @@ out/
 
 # Local configuration files (avoid secrets)
 *.local.json
+appsettings.json
 appsettings.Development.json
 appsettings.*.local.json
 

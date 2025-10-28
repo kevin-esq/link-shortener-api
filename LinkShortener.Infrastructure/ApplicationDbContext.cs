@@ -15,12 +15,14 @@ namespace LinkShortener.Infrastructure
         public DbSet<LinkAccess> LinkAccesses { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<Session> Sessions { get; set; } = null!;
+        public DbSet<UserRole> UserRoles { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             ConfigureUserEntity(modelBuilder);
+            ConfigureUserRoleEntity(modelBuilder);
             ConfigureLinkEntity(modelBuilder);
             ConfigureLinkAccessEntity(modelBuilder);
             ConfigureRefreshTokenEntity(modelBuilder);
@@ -45,19 +47,16 @@ namespace LinkShortener.Infrastructure
                        .IsRequired();
 
                 builder.Property(u => u.CreatedOnUtc)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
+                       .IsRequired();
 
                 builder.Property(u => u.IsActive)
                        .IsRequired();
 
                 builder.Property(u => u.IsEmailVerified)
-                       .IsRequired()
-                       .HasDefaultValue(false);
+                       .IsRequired();
 
                 builder.Property(u => u.EmailVerifiedAt)
-                       .IsRequired(false)
-                       .HasColumnType("datetime2");
+                       .IsRequired(false);
 
                 builder.Property(u => u.AuthProvider)
                        .IsRequired()
@@ -73,17 +72,50 @@ namespace LinkShortener.Infrastructure
                        .HasConversion<string>()
                        .HasMaxLength(30);
 
-                builder.Property(u => u.SuspendedAt)
-                       .HasColumnType("datetime2");
+                builder.Property(u => u.SuspendedAt);
 
                 builder.Property(u => u.SuspensionReason)
                        .HasMaxLength(500);
 
-                builder.Property(u => u.LastLoginAt)
-                       .HasColumnType("datetime2");
+                builder.Property(u => u.LastLoginAt);
 
                 builder.HasIndex(u => new { u.Email, u.AuthProvider })
                        .IsUnique();
+            });
+        }
+
+        private static void ConfigureUserRoleEntity(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserRole>(builder =>
+            {
+                builder.HasKey(ur => ur.Id);
+
+                builder.Property(ur => ur.UserId)
+                       .IsRequired();
+
+                builder.Property(ur => ur.Role)
+                       .IsRequired()
+                       .HasConversion<string>()
+                       .HasMaxLength(20);
+
+                builder.Property(ur => ur.GrantedAt)
+                       .IsRequired();
+
+                builder.Property(ur => ur.GrantedBy)
+                       .IsRequired(false);
+
+                builder.HasIndex(ur => new { ur.UserId, ur.Role })
+                       .IsUnique();
+
+                builder.HasOne(ur => ur.User)
+                       .WithMany(u => u.UserRoles)
+                       .HasForeignKey(ur => ur.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(ur => ur.GrantedByUser)
+                       .WithMany()
+                       .HasForeignKey(ur => ur.GrantedBy)
+                       .OnDelete(DeleteBehavior.NoAction);
             });
         }
 
@@ -94,20 +126,17 @@ namespace LinkShortener.Infrastructure
                 builder.HasKey(l => l.Id);
 
                 builder.Property(l => l.LongUrl)
-                       .IsRequired()
-                       .HasColumnType("nvarchar(max)");
+                       .IsRequired();
 
                 builder.Property(l => l.Code)
                        .IsRequired()
                        .HasMaxLength(NumberOfCharsInShortlink);
 
                 builder.Property(l => l.CreatedOnUtc)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
+                       .IsRequired();
 
                 builder.Property(l => l.UpdatedOnUtc)
-                       .IsRequired(false)
-                       .HasColumnType("datetime2");
+                       .IsRequired(false);
 
                 builder.HasIndex(l => l.Code)
                        .IsUnique();
@@ -139,13 +168,7 @@ namespace LinkShortener.Infrastructure
                        .HasMaxLength(512);
 
                 builder.Property(a => a.AccessedOnUtc)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
-
-                builder.HasOne(a => a.Link)
-                       .WithMany(l => l.Accesses)
-                       .HasForeignKey(a => a.LinkId)
-                       .OnDelete(DeleteBehavior.Cascade);
+                       .IsRequired();
 
                 builder.HasOne(a => a.User)
                        .WithMany()
@@ -165,12 +188,10 @@ namespace LinkShortener.Infrastructure
                        .HasMaxLength(500);
 
                 builder.Property(rt => rt.CreatedAt)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
+                       .IsRequired();
 
                 builder.Property(rt => rt.ExpiresAt)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
+                       .IsRequired();
 
                 builder.Property(rt => rt.IsRevoked)
                        .IsRequired();
@@ -178,11 +199,9 @@ namespace LinkShortener.Infrastructure
                 builder.Property(rt => rt.IsUsed)
                        .IsRequired();
 
-                builder.Property(rt => rt.RevokedAt)
-                       .HasColumnType("datetime2");
+                builder.Property(rt => rt.RevokedAt);
 
-                builder.Property(rt => rt.UsedAt)
-                       .HasColumnType("datetime2");
+                builder.Property(rt => rt.UsedAt);
 
                 builder.Property(rt => rt.ReplacedByToken)
                        .HasMaxLength(500);
@@ -220,15 +239,12 @@ namespace LinkShortener.Infrastructure
                        .HasMaxLength(200);
 
                 builder.Property(s => s.CreatedAt)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
+                       .IsRequired();
 
                 builder.Property(s => s.LastActivityAt)
-                       .IsRequired()
-                       .HasColumnType("datetime2");
+                       .IsRequired();
 
-                builder.Property(s => s.EndedAt)
-                       .HasColumnType("datetime2");
+                builder.Property(s => s.EndedAt);
 
                 builder.Property(s => s.IsActive)
                        .IsRequired();

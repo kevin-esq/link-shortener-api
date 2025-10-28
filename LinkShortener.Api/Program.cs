@@ -16,7 +16,12 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -69,7 +74,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!)
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")!)
 );
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
@@ -114,6 +119,7 @@ builder.Services.AddScoped<IUrlRepository, UrlRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddSingleton<IJwtService>(new JwtService(
     privateKey,
@@ -145,9 +151,9 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
 
 builder.Services.AddSingleton<IVerificationCodeStore, VerificationCodeStore>();
 
-var googleClientId = builder.Configuration["Google:ClientId"] 
+var googleClientId = builder.Configuration["Google:ClientId"]
     ?? throw new InvalidOperationException("Missing Google:ClientId configuration");
-builder.Services.AddSingleton<IGoogleAuthService>(sp => 
+builder.Services.AddSingleton<IGoogleAuthService>(sp =>
     new GoogleAuthService(googleClientId, sp.GetRequiredService<ILogger<GoogleAuthService>>()));
 
 builder.Services.AddMediatR(cfg =>

@@ -10,7 +10,7 @@ namespace LinkShortener.Api.Middleware
         private readonly IHostEnvironment _env;
 
         public GlobalExceptionMiddleware(
-            RequestDelegate next, 
+            RequestDelegate next,
             ILogger<GlobalExceptionMiddleware> logger,
             IHostEnvironment env)
         {
@@ -66,10 +66,10 @@ namespace LinkShortener.Api.Middleware
 
                 default:
                     errorDetails.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    errorDetails.Message = _env.IsDevelopment() 
-                        ? exception.Message 
+                    errorDetails.Message = _env.IsDevelopment()
+                        ? exception.Message
                         : "An internal server error occurred";
-                    
+
                     if (_env.IsDevelopment() && exception.StackTrace != null)
                     {
                         errorDetails.Errors = new List<string> { exception.StackTrace };

@@ -55,7 +55,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
                 await _userRepository.AddAsync(user, ct);
                 await _userRepository.SaveChangesAsync(ct);
 
-                _logger.LogInformation("New user created via Google OAuth: {UserId}, Email: {Email}", 
+                _logger.LogInformation("New user created via Google OAuth: {UserId}, Email: {Email}",
                     user.Id, user.Email);
             }
             else if (user.AuthProvider != AuthProvider.Google)

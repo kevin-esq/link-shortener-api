@@ -1,9 +1,9 @@
 using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Abstractions.Services;
+using LinkShortener.Application.Common.Validators;
 using LinkShortener.Application.Features.Auth.Commands;
 using MediatR;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
@@ -11,11 +11,16 @@ namespace LinkShortener.Application.Features.Auth.Handlers
     {
         private readonly IUserRepository _repository;
         private readonly IVerificationCodeStore _codeStore;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public ResetPasswordCommandHandler(IUserRepository repository, IVerificationCodeStore codeStore)
+        public ResetPasswordCommandHandler(
+            IUserRepository repository,
+            IVerificationCodeStore codeStore,
+            IPasswordHasher passwordHasher)
         {
             _repository = repository;
             _codeStore = codeStore;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
@@ -28,7 +33,11 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             if (user == null)
                 throw new ArgumentException("User not found.");
 
-            var newHash = HashPassword(request.NewPassword);
+            var (isValid, errorMessage) = PasswordValidator.Validate(request.NewPassword);
+            if (!isValid)
+                throw new ArgumentException(errorMessage);
+
+            var newHash = _passwordHasher.HashPassword(request.NewPassword);
 
             user.ChangePassword(newHash);
             await _repository.SaveChangesAsync(cancellationToken);
@@ -36,12 +45,5 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             await _codeStore.DeleteCodeAsync(request.Email, cancellationToken);
         }
 
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
     }
 }

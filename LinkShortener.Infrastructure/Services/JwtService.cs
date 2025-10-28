@@ -22,7 +22,7 @@ namespace LinkShortener.Infrastructure.Security
             _audience = audience;
         }
 
-        public string GenerateToken(Guid userId, string? email = null, IReadOnlyCollection<UserRole>? roles = null)
+        public string GenerateToken(Guid userId, string? email = null, IReadOnlyCollection<Role>? roles = null)
         {
             var now = DateTime.UtcNow;
             var expires = now.Add(_accessTokenLifetime);
