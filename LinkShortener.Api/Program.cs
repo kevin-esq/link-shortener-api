@@ -77,6 +77,28 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")!)
 );
 
+// Redis connection (optional - for analytics caching)
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    try
+    {
+        builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(
+            StackExchange.Redis.ConnectionMultiplexer.Connect(redisConnectionString));
+        Console.WriteLine("✅ Redis connected successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Redis connection failed: {ex.Message}. Analytics caching will be disabled.");
+        builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(sp => null!);
+    }
+}
+else
+{
+    Console.WriteLine("ℹ️ Redis not configured. Analytics caching will be disabled.");
+    builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(sp => null!);
+}
+
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 var issuer = jwtConfig["Issuer"] ?? throw new InvalidOperationException("Missing Jwt:Issuer");
 var audience = jwtConfig["Audience"] ?? throw new InvalidOperationException("Missing Jwt:Audience");
@@ -115,11 +137,26 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
+// Repository registrations
 builder.Services.AddScoped<IUrlRepository, UrlRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
+builder.Services.AddScoped<ILinkStatsRepository, LinkStatsRepository>();
+
+// Security and hashing
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+// Analytics services (LinkPulse)
+builder.Services.AddSingleton<IUserAgentParser, UserAgentParserService>();
+builder.Services.AddScoped<IGeolocationService, GeolocationService>();
+builder.Services.AddSingleton<IAnalyticsCacheService, AnalyticsCacheService>();
+
+// Audit and Metrics services
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IClickEventService, ClickEventService>();
+builder.Services.AddSingleton<IQrCodeService, QrCodeService>();
 
 builder.Services.AddSingleton<IJwtService>(new JwtService(
     privateKey,
@@ -160,9 +197,14 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(ShortenUrlCommandHandler).Assembly)
 );
 
+// Background services
+builder.Services.AddHostedService<AnalyticsBackgroundService>();
+builder.Services.AddHostedService<MetricsAggregationService>();
+
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<AuditMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
