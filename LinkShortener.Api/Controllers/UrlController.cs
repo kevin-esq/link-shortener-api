@@ -1,4 +1,5 @@
-﻿using LinkShortener.Application.Features.Url.Commands;
+using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Features.Url.Commands;
 using LinkShortener.Application.Features.Url.DTOs;
 using LinkShortener.Application.Features.Url.Queries;
 using MediatR;
@@ -13,9 +14,10 @@ namespace LinkShortener.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class UrlController(IMediator mediator) : ControllerBase
+    public class UrlController(IMediator mediator, IClickEventService clickEventService) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
+        private readonly IClickEventService _clickEventService = clickEventService;
 
         /// <summary>
         /// Creates a shortened URL for the authenticated user.
@@ -89,13 +91,48 @@ namespace LinkShortener.Api.Controllers
                 ? "unknown"
                 : (ipAddress.IsIPv4MappedToIPv6 ? ipAddress.MapToIPv4().ToString() : ipAddress.ToString());
 
-            // Record link access
+            // Record link access with enhanced analytics
+            var startTime = DateTime.UtcNow;
+            
             await _mediator.Send(new RegisterLinkAccessCommand(
                 LinkId: result.Id,
-                UserId: null,
                 IpAddress: ipString,
-                UserAgent: Request.Headers.UserAgent.ToString()
+                UserAgent: Request.Headers.UserAgent.ToString() ?? "Unknown",
+                UserId: null,
+                Referer: Request.Headers.Referer.ToString()
             ));
+
+            // Record click event for advanced metrics
+            var utmParams = new Dictionary<string, string>();
+            if (Request.Query.TryGetValue("utm_source", out var utmSource))
+                utmParams["utm_source"] = utmSource.ToString();
+            if (Request.Query.TryGetValue("utm_medium", out var utmMedium))
+                utmParams["utm_medium"] = utmMedium.ToString();
+            if (Request.Query.TryGetValue("utm_campaign", out var utmCampaign))
+                utmParams["utm_campaign"] = utmCampaign.ToString();
+            if (Request.Query.TryGetValue("utm_content", out var utmContent))
+                utmParams["utm_content"] = utmContent.ToString();
+            if (Request.Query.TryGetValue("utm_term", out var utmTerm))
+                utmParams["utm_term"] = utmTerm.ToString();
+
+            var latencyMs = (int)(DateTime.UtcNow - startTime).TotalMilliseconds;
+            var requestId = Request.HttpContext.Items["RequestId"]?.ToString();
+
+            await _clickEventService.RecordClickAsync(
+                result.Id,
+                Code,
+                result.OriginalUrl,
+                null,
+                Request.Headers.Referer.ToString(),
+                utmParams.Count > 0 ? utmParams : null,
+                ipString,
+                Request.Headers.UserAgent.ToString() ?? "Unknown",
+                Request.Headers.AcceptLanguage.ToString(),
+                Domain.Entities.ClickStatus.Redirected,
+                latencyMs,
+                "302",
+                requestId
+            );
 
             return Redirect(result.OriginalUrl);
         }
@@ -133,6 +170,88 @@ namespace LinkShortener.Api.Controllers
                 return NotFound();
 
             return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("my-links")]
+        public async Task<IActionResult> GetMyLinks(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? search = null,
+            [FromQuery] string? orderBy = "createdAt",
+            [FromQuery] string? orderDirection = "desc",
+            CancellationToken cancellationToken = default)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim is null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim);
+
+            var result = await _mediator.Send(
+                new GetUserLinksQuery(userId, page, pageSize, search, orderBy, orderDirection), 
+                cancellationToken);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpDelete("{code}")]
+        public async Task<IActionResult> DeleteLink(string code, CancellationToken cancellationToken)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim is null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim);
+
+            var result = await _mediator.Send(new DeleteLinkCommand(code, userId), cancellationToken);
+            
+            if (!result)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{code}/stats")]
+        public async Task<IActionResult> GetLinkStats(
+            string code,
+            [FromQuery] int days = 30,
+            CancellationToken cancellationToken = default)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim is null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim);
+
+            var result = await _mediator.Send(new GetLinkStatsQuery(code, userId, days), cancellationToken);
+            
+            if (result is null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("{code}/qr")]
+        public async Task<IActionResult> GetQrCode(
+            string code,
+            [FromQuery] int size = 300,
+            CancellationToken cancellationToken = default)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim is null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim);
+
+            var result = await _mediator.Send(new GetQrCodeQuery(code, userId, size), cancellationToken);
+            
+            if (result is null)
+                return NotFound();
+
+            return File(result.QrCodeImage, "image/png", $"{code}_qr.png");
         }
     }
 }
