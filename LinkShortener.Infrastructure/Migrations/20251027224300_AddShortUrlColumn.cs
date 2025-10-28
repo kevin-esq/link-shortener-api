@@ -5,31 +5,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LinkShortener.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserRolesColumn : Migration
+    public partial class AddShortUrlColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Roles",
-                table: "Users",
-                type: "nvarchar(max)",
+                name: "ShortUrl",
+                table: "Links",
+                type: "text",
                 nullable: false,
-                defaultValue: "User");
-
-            migrationBuilder.Sql(@"
-                UPDATE Users 
-                SET Roles = 'User' 
-                WHERE Roles IS NULL OR Roles = ''
-            ");
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Roles",
-                table: "Users");
+                name: "ShortUrl",
+                table: "Links");
         }
     }
 }
