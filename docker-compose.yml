@@ -67,12 +67,9 @@ services:
       - Jwt__Audience=${Jwt__Audience:-LinkShortenerClient}
       - Jwt__KeysFolder=/app/Keys
       
-      # Email
-      - Email__Host=${Email__Host}
-      - Email__Port=${Email__Port:-587}
-      - Email__Username=${Email__Username}
-      - Email__Password=${Email__Password}
-      - Email__FromAddress=${Email__FromAddress}
+      # Email (Resend API)
+      - Resend__ApiKey=${Resend__ApiKey}
+      - Email__FromAddress=${Email__FromAddress:-onboarding@resend.dev}
       
       # Google OAuth
       - Google__ClientId=${Google__ClientId}

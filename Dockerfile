@@ -37,12 +37,12 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 # Copy published files
 COPY --from=publish /app/publish .
 
-# Create directory for JWT keys
-RUN mkdir -p /app/Keys
-
-# Entry script to generate RSA keys if they don't exist
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+# Create directory for JWT keys and generate them
+RUN mkdir -p /app/Keys && \
+    openssl genpkey -algorithm RSA -out /app/Keys/private.pem -pkeyopt rsa_keygen_bits:2048 && \
+    openssl rsa -pubout -in /app/Keys/private.pem -out /app/Keys/public.pem && \
+    chmod 600 /app/Keys/private.pem && \
+    chmod 644 /app/Keys/public.pem
 
 # Expose port
 EXPOSE 8080
@@ -54,6 +54,5 @@ RUN useradd -m -u 1001 appuser && \
 
 USER appuser
 
-# Entry point
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Start application
 CMD ["dotnet", "LinkShortener.Api.dll"]
