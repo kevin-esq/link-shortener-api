@@ -31,6 +31,23 @@
 
 ---
 
+## 📚 API Documentation
+
+Comprehensive endpoint documentation for all controllers:
+
+| Controller | Description | Documentation |
+|------------|-------------|---------------|
+| 🔐 **Auth** | Authentication, registration, OAuth | [AuthController.md](docs/AuthController.md) |
+| 🔗 **URL** | URL shortening, redirection, QR codes | [UrlController.md](docs/UrlController.md) |
+| 📊 **Analytics** | Link analytics, dashboards, summaries | [AnalyticsController.md](docs/AnalyticsController.md) |
+| 📊 **Metrics** | Click events, detailed statistics | [MetricsController.md](docs/MetricsController.md) |
+| 🛠️ **Admin** | User management, roles, sessions | [AdminController.md](docs/AdminController.md) |
+| 📝 **Audit** | Audit logs, compliance tracking | [AuditController.md](docs/AuditController.md) |
+
+**Interactive API**: Access Swagger UI at `http://localhost:8080/swagger` (Docker) or `https://localhost:7092/swagger` (local)
+
+---
+
 ## ✨ Features
 
 ### 🎯 Core Functionality
@@ -109,7 +126,9 @@
 ### Prerequisites
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- [PostgreSQL](https://www.postgresql.org/download/) or Supabase account
+- [Supabase](https://supabase.com) account (free tier available) or local PostgreSQL
+- [Resend](https://resend.com) account for email delivery (free tier: 100 emails/day)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (optional, for containerized deployment)
 - (Optional) [Redis](https://redis.io/download) for analytics caching
 
 ### Installation
@@ -190,17 +209,6 @@
    🎉 API available at:
    - **Swagger UI**: `https://localhost:7092/swagger`
    - **API Base**: `https://localhost:7092/api`
-
-### Optional: Google OAuth Setup
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Enable **Google+ API**
-4. Create **OAuth 2.0 Client ID** (Web application)
-5. Add authorized origins: `http://localhost:3000`
-6. Copy the Client ID to `appsettings.json`
-
-See [`QUICK_START_GOOGLE_OAUTH.md`](QUICK_START_GOOGLE_OAUTH.md) for detailed instructions.
 
 ## 📡 API Endpoints
 
@@ -594,7 +602,7 @@ dotnet test /p:CollectCoverage=true
 **Authentication & Security**
 - 🔐 **JWT (RSA-256)** - Asymmetric token signing
 - 🌐 **Google OAuth 2.0** - Social authentication
-- 🔑 **SMTP Email** - Verification and recovery
+- 📧 **Resend API** - Transactional email delivery
 
 **Analytics & Tracking**
 - 📊 **UAParser** - User agent parsing
@@ -636,10 +644,18 @@ docker-compose up -d --build
 ```
 
 **Configuration Files:**
-- `Dockerfile` - Optimized multi-stage build
-- `docker-compose.yml` - Complete stack (API + PostgreSQL + Redis)
+- `Dockerfile` - Optimized multi-stage build with auto-generated JWT RSA keys
+- `docker-compose.yml` - Complete stack (API + Redis + external database)
 - `.env.example` - Environment variables template
-- `docker-entrypoint.sh` - Auto-generation of JWT keys
+
+**Database Options:**
+- **Supabase (Recommended)**: Use Session Pooler for IPv4 compatibility (Docker/Render/Vercel)
+- **Local PostgreSQL**: Uncomment `postgres` service in `docker-compose.yml`
+
+**Email Service:**
+- **Resend API**: Free tier includes 100 emails/day, 3,000 emails/month
+- Get your API key at: https://resend.com/api-keys
+- Use `onboarding@resend.dev` for testing (no domain verification needed)
 
 ---
 
@@ -647,10 +663,11 @@ docker-compose up -d --build
 
 **Configuration**
 - [ ] Update `.env` with production values (never commit `.env`)
-- [ ] RSA keys auto-generated in Docker (or use `dotnet run --project KeyGenerator`)
-- [ ] Set production database connection string in `.env`
-- [ ] Configure Redis for caching (included in docker-compose)
-- [ ] Update Google OAuth credentials in `.env`
+- [ ] RSA keys are auto-generated during Docker build
+- [ ] Use Supabase **Session Pooler** connection string (IPv4 compatible)
+- [ ] Configure Resend API key for email delivery
+- [ ] Configure Redis for analytics caching (included in docker-compose)
+- [ ] Update Google OAuth Client ID in `.env`
 
 **Security**
 - [ ] Enable HTTPS and HSTS (use reverse proxy: Nginx/Traefik)
