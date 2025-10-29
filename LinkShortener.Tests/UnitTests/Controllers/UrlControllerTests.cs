@@ -1,4 +1,5 @@
 using LinkShortener.Api.Controllers;
+using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Commands;
 using LinkShortener.Application.Features.Url.DTOs;
 using LinkShortener.Application.Features.Url.Queries;
@@ -30,7 +31,8 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 .Setup(m => m.Send(It.IsAny<ShortenUrlCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
-            var controller = new UrlController(mockMediator.Object);
+            var mockClickEventService = new Mock<IClickEventService>();
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
 
             // Setup HttpContext with user claims
             var claims = new List<Claim>
@@ -60,7 +62,8 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         {
             // Arrange
             var mockMediator = new Mock<IMediator>();
-            var controller = new UrlController(mockMediator.Object);
+            var mockClickEventService = new Mock<IClickEventService>();
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
             var request = new ShortenUrlRequest { Url = "" };
 
             // Act
@@ -91,7 +94,8 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 .Setup(m => m.Send(It.IsAny<RegisterLinkAccessCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(Unit.Value));
 
-            var controller = new UrlController(mockMediator.Object);
+            var mockClickEventService = new Mock<IClickEventService>();
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -115,7 +119,8 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 .Setup(m => m.Send(It.IsAny<GetPublicUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetUrlInfoResponse?)null);
 
-            var controller = new UrlController(mockMediator.Object);
+            var mockClickEventService = new Mock<IClickEventService>();
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -146,7 +151,8 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 .Setup(m => m.Send(It.IsAny<GetPrivateUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
-            var controller = new UrlController(mockMediator.Object);
+            var mockClickEventService = new Mock<IClickEventService>();
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -178,7 +184,8 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 .Setup(m => m.Send(It.IsAny<GetPrivateUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetUrlInfoResponse?)null);
 
-            var controller = new UrlController(mockMediator.Object);
+            var mockClickEventService = new Mock<IClickEventService>();
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -196,6 +203,195 @@ namespace LinkShortener.Tests.UnitTests.Controllers
             var result = await controller.GetInfo("INVALID", CancellationToken.None);
 
             // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task GetMyLinks_ReturnsOk_WithPaginatedLinks()
+        {
+            var mockMediator = new Mock<IMediator>();
+            var mockClickEventService = new Mock<IClickEventService>();
+            var userId = Guid.NewGuid();
+
+            var response = new UserLinksResponse(
+                new List<LinkSummaryDto>
+                {
+                    new LinkSummaryDto(
+                        Guid.NewGuid(),
+                        "ABC123",
+                        "https://short.link/ABC123",
+                        "https://example.com/long-url",
+                        DateTime.UtcNow,
+                        42,
+                        DateTime.UtcNow)
+                },
+                1,
+                1,
+                20,
+                1);
+
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<GetUserLinksQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var result = await controller.GetMyLinks(1, 20, null, "createdAt", "desc", CancellationToken.None);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnedResponse = Assert.IsType<UserLinksResponse>(okResult.Value);
+            Assert.Single(returnedResponse.Links);
+            Assert.Equal(42, returnedResponse.Links[0].TotalClicks);
+        }
+
+        [Fact]
+        public async Task DeleteLink_ValidCode_ReturnsNoContent()
+        {
+            var mockMediator = new Mock<IMediator>();
+            var mockClickEventService = new Mock<IClickEventService>();
+            var userId = Guid.NewGuid();
+
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<DeleteLinkCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var result = await controller.DeleteLink("ABC123", CancellationToken.None);
+
+            Assert.IsType<NoContentResult>(result);
+            mockMediator.Verify(m => m.Send(
+                It.Is<DeleteLinkCommand>(cmd => cmd.Code == "ABC123" && cmd.UserId == userId),
+                It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteLink_NotFound_ReturnsNotFound()
+        {
+            var mockMediator = new Mock<IMediator>();
+            var mockClickEventService = new Mock<IClickEventService>();
+            var userId = Guid.NewGuid();
+
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<DeleteLinkCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var result = await controller.DeleteLink("INVALID", CancellationToken.None);
+
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task GetLinkStats_ValidCode_ReturnsStats()
+        {
+            var mockMediator = new Mock<IMediator>();
+            var mockClickEventService = new Mock<IClickEventService>();
+            var userId = Guid.NewGuid();
+
+            var response = new LinkStatsResponse(
+                "ABC123",
+                "https://example.com",
+                100,
+                75,
+                DateTime.UtcNow,
+                new List<DailyClicksDto>(),
+                new List<CountryClicksDto> { new CountryClicksDto("MX", 50, 50.0) },
+                new List<DeviceClicksDto> { new DeviceClicksDto("mobile", 60, 60.0) },
+                new List<BrowserClicksDto> { new BrowserClicksDto("Chrome", 80, 80.0) },
+                new List<RefererClicksDto>());
+
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<GetLinkStatsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var result = await controller.GetLinkStats("ABC123", 30, CancellationToken.None);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var stats = Assert.IsType<LinkStatsResponse>(okResult.Value);
+            Assert.Equal(100, stats.TotalClicks);
+            Assert.Equal(75, stats.UniqueVisitors);
+            Assert.Single(stats.ClicksByCountry);
+        }
+
+        [Fact]
+        public async Task GetLinkStats_NotFound_ReturnsNotFound()
+        {
+            var mockMediator = new Mock<IMediator>();
+            var mockClickEventService = new Mock<IClickEventService>();
+            var userId = Guid.NewGuid();
+
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<GetLinkStatsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((LinkStatsResponse?)null);
+
+            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var result = await controller.GetLinkStats("INVALID", 30, CancellationToken.None);
+
             Assert.IsType<NotFoundResult>(result);
         }
     }

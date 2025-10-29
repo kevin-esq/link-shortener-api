@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace LinkShortener.Application.Features.Url.Commands
 {
@@ -6,6 +6,7 @@ namespace LinkShortener.Application.Features.Url.Commands
         Guid LinkId,
         string IpAddress,
         string UserAgent,
-        Guid? UserId = null
+        Guid? UserId = null,
+        string? Referer = null
     ) : IRequest<Unit>;
 }

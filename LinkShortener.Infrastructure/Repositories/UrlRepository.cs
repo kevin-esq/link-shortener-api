@@ -1,4 +1,4 @@
-﻿using LinkShortener.Application.Abstractions;
+using LinkShortener.Application.Abstractions;
 using LinkShortener.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -114,7 +114,7 @@ namespace LinkShortener.Infrastructure.Repositories
 
         #endregion
 
-        #region LinkAccess (Auditoría)
+        #region LinkAccess (Audit)
 
         /// <summary>
         /// Registers a new access event for a given link.
@@ -131,5 +131,77 @@ namespace LinkShortener.Infrastructure.Repositories
         }
 
         #endregion
+
+        public async Task<(List<LinkWithStats> links, int totalCount)> GetUserLinksPagedAsync(
+            Guid userId,
+            int page,
+            int pageSize,
+            string? search,
+            string? orderBy,
+            string? orderDirection,
+            CancellationToken cancellationToken)
+        {
+            var query = _context.Links
+                .Where(l => l.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchLower = search.ToLower();
+                query = query.Where(l => 
+                    l.Code.ToLower().Contains(searchLower) || 
+                    l.LongUrl.ToLower().Contains(searchLower) ||
+                    l.ShortUrl.ToLower().Contains(searchLower));
+            }
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            query = (orderBy?.ToLower(), orderDirection?.ToLower()) switch
+            {
+                ("clicks", "asc") => query.OrderBy(l => _context.ClickEvents.Count(c => c.LinkId == l.Id)),
+                ("clicks", _) => query.OrderByDescending(l => _context.ClickEvents.Count(c => c.LinkId == l.Id)),
+                ("code", "asc") => query.OrderBy(l => l.Code),
+                ("code", "desc") => query.OrderByDescending(l => l.Code),
+                ("url", "asc") => query.OrderBy(l => l.LongUrl),
+                ("url", "desc") => query.OrderByDescending(l => l.LongUrl),
+                ("createdat", "asc") or ("created", "asc") => query.OrderBy(l => l.CreatedOnUtc),
+                _ => query.OrderByDescending(l => l.CreatedOnUtc)
+            };
+
+            var links = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(l => new LinkWithStats(
+                    l.Id,
+                    l.Code,
+                    l.ShortUrl,
+                    l.LongUrl,
+                    l.CreatedOnUtc,
+                    _context.ClickEvents.Count(c => c.LinkId == l.Id),
+                    _context.ClickEvents
+                        .Where(c => c.LinkId == l.Id)
+                        .OrderByDescending(c => c.Timestamp)
+                        .Select(c => (DateTime?)c.Timestamp)
+                        .FirstOrDefault()
+                ))
+                .ToListAsync(cancellationToken);
+
+            return (links, totalCount);
+        }
+
+        public async Task<bool> DeleteLinkAsync(string code, Guid userId, CancellationToken cancellationToken)
+        {
+            var link = await _context.Links
+                .FirstOrDefaultAsync(l => l.Code == code && l.UserId == userId, cancellationToken);
+
+            if (link == null)
+                return false;
+
+            _context.Links.Remove(link);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            _cache.Remove($"Link_{code}");
+
+            return true;
+        }
     }
 }
