@@ -1,0 +1,107 @@
+# ======================================
+# 🛠️ Docker Compose Override Example
+# ======================================
+# 
+
+version: '3.8'
+
+services:
+  # ======================================
+  # 🚀 API - Development Configuration
+  # ======================================
+  api:
+    environment:
+      # Change to Development for more logs
+      - ASPNETCORE_ENVIRONMENT=Development
+      
+      # Enable hot reload (optional, requires mounting code)
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+      
+      # More detailed logs for debugging
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+      - Logging__LogLevel__Microsoft.EntityFrameworkCore=Information
+    
+    # Hot reload: mount source code (uncomment if needed)
+    # volumes:
+    #   - ./LinkShortener.Api:/app
+    #   - ./LinkShortener.Application:/src/LinkShortener.Application
+    #   - ./LinkShortener.Infrastructure:/src/LinkShortener.Infrastructure
+    #   - ./LinkShortener.Domain:/src/LinkShortener.Domain
+    
+    # Change port if 8080 is occupied
+    # ports:
+    #   - "5000:8080"
+
+  # ======================================
+  # 🐘 PostgreSQL - Admin Tools
+  # ======================================
+  
+  # Optional: Add pgAdmin to manage the database
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: linkshortener-pgadmin
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@linkshortener.local
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   ports:
+  #     - "5050:80"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - linkshortener-network
+
+  # ======================================
+  # 🔴 Redis - Admin Tools
+  # ======================================
+  
+  # Optional: Redis Commander to visualize cache
+  # redis-commander:
+  #   image: rediscommander/redis-commander:latest
+  #   container_name: linkshortener-redis-commander
+  #   environment:
+  #     - REDIS_HOSTS=local:redis:6379
+  #   ports:
+  #     - "8081:8081"
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - linkshortener-network
+
+  # ======================================
+  # 📧 MailHog - Local SMTP Testing
+  # ======================================
+  
+  # Optional: MailHog for email testing without actually sending them
+  # mailhog:
+  #   image: mailhog/mailhog:latest
+  #   container_name: linkshortener-mailhog
+  #   ports:
+  #     - "1025:1025"  # SMTP
+  #     - "8025:8025"  # Web UI
+  #   networks:
+  #     - linkshortener-network
+
+  # If using MailHog, update the Email configuration in the 'api' service:
+  # api:
+  #   environment:
+  #     - Email__Host=mailhog
+  #     - Email__Port=1025
+  #     - Email__Username=""
+  #     - Email__Password=""
+
+# ======================================
+# 📝 USAGE EXAMPLES
+# ======================================
+#
+# Development with pgAdmin and Redis Commander:
+# docker-compose up -d
+#
+# Access:
+# - API: http://localhost:8080
+# - Swagger: http://localhost:8080/swagger
+# - pgAdmin: http://localhost:5050
+# - Redis Commander: http://localhost:8081
+# - MailHog: http://localhost:8025
+#
+# ======================================

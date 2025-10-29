@@ -618,45 +618,73 @@ dotnet test /p:CollectCoverage=true
 
 ## 🚀 Deployment
 
+### 🐳 Docker Deployment (Recommended)
+
+**Quick Start with Docker Compose:**
+
+```bash
+# 1. Configure environment variables
+cp .env.example .env
+# Edit .env with your credentials
+
+# 2. Run with Docker Compose
+docker-compose up -d --build
+
+# 3. Access the application
+# API: http://localhost:8080
+# Swagger: http://localhost:8080/swagger
+```
+
+**Configuration Files:**
+- `Dockerfile` - Optimized multi-stage build
+- `docker-compose.yml` - Complete stack (API + PostgreSQL + Redis)
+- `.env.example` - Environment variables template
+- `docker-entrypoint.sh` - Auto-generation of JWT keys
+
+---
+
 ### Production Checklist
 
 **Configuration**
-- [ ] Update `appsettings.Production.json` with production values
-- [ ] Generate new RSA keys for JWT signing
-- [ ] Set production database connection string
-- [ ] Configure Redis for caching (optional)
-- [ ] Update Google OAuth credentials
+- [ ] Update `.env` with production values (never commit `.env`)
+- [ ] RSA keys auto-generated in Docker (or use `dotnet run --project KeyGenerator`)
+- [ ] Set production database connection string in `.env`
+- [ ] Configure Redis for caching (included in docker-compose)
+- [ ] Update Google OAuth credentials in `.env`
 
 **Security**
-- [ ] Enable HTTPS and HSTS
+- [ ] Enable HTTPS and HSTS (use reverse proxy: Nginx/Traefik)
 - [ ] Configure CORS policies
 - [ ] Enable rate limiting
 - [ ] Set up WAF (Web Application Firewall)
+- [ ] Use Docker Secrets for production (instead of `.env`)
 - [ ] Review security headers
 
 **Database**
-- [ ] Apply all migrations
-- [ ] Set up automated backups
+- [ ] Apply all migrations (`docker-compose exec api dotnet ef database update`)
+- [ ] Set up automated backups (PostgreSQL volumes)
 - [ ] Configure connection pooling
 - [ ] Set up read replicas (optional)
 
 **Monitoring**
 - [ ] Configure logging (Serilog, Application Insights)
 - [ ] Set up error tracking (Sentry, Raygun)
-- [ ] Enable health checks
+- [ ] Enable health checks (included in docker-compose)
 - [ ] Configure alerts (email, Slack)
 
 **Performance**
-- [ ] Enable Redis caching
+- [ ] Enable Redis caching (included in docker-compose)
 - [ ] Configure CDN for static assets
 - [ ] Set up load balancing
 - [ ] Optimize database indexes
 
-**Recommended Platforms**
-- ☁️ **Azure App Service** - Easy deployment
-- 🐳 **Docker + Kubernetes** - Container orchestration
-- 🌐 **Railway/Render** - Quick deployment
-- 🟢 **Supabase** - PostgreSQL hosting
+**Recommended Deployment Options**
+- 🐳 **Docker Compose** - ⭐ Easiest (included, production-ready)
+- ☁️ **Azure Container Instances** - Deploy docker-compose.yml directly
+- 🚢 **AWS ECS/Fargate** - Container orchestration
+- ☸️ **Kubernetes** - Enterprise scale
+- 🌐 **Railway/Render** - Quick deployment with Docker support
+- 🟢 **Supabase** - PostgreSQL hosting + Docker deployment
 
 ## 🤝 Contributing
 

@@ -1,6 +1,4 @@
-# ======================================
-# 🧩 VISUAL STUDIO / .NET STANDARD IGNORES
-# ======================================
+# Visual Studio / .NET Standard ignores
 
 # User-specific files
 .vs/
@@ -26,9 +24,10 @@ out/
 
 # Local configuration files (avoid secrets)
 *.local.json
-appsettings.json
 appsettings.Development.json
 appsettings.*.local.json
+# NOTE: appsettings.json is NOT ignored (contains safe example values)
+# Use .env or User Secrets for real credentials
 
 # Rider / Resharper
 .idea/
@@ -53,9 +52,7 @@ Generated\ Files/
 Thumbs.db
 desktop.ini
 
-# ======================================
-# 🧱 PROJECT-SPECIFIC IGNORES
-# ======================================
+# Project-specific ignores
 
 # Root-level VS folder
 /.vs
@@ -70,9 +67,7 @@ link-shortener/obj/Debug/net8.0/link-shortener.AssemblyInfoInputs.cache
 link-shortener/obj/Debug/net8.0/link-shortener.assets.cache
 link-shortener/obj/Debug/net8.0/link-shortener.GeneratedMSBuildEditorConfig.editorconfig
 
-# ======================================
-# 🔒 SECURITY: IGNORE RSA KEYS & SECRETS
-# ======================================
+# Security: Ignore RSA keys & secrets
 
 # PEM keys (private/public)
 *.pem
@@ -88,9 +83,7 @@ LinkShortener.Application/Abstractions/Security/Keys/
 **/private.pem
 **/public.pem
 
-# ======================================
-# 🧰 TOOLING / ENVIRONMENT
-# ======================================
+# Tooling / Environment
 
 # VS Code settings
 .vscode/
@@ -98,11 +91,10 @@ LinkShortener.Application/Abstractions/Security/Keys/
 # Docker / Environment
 .env
 .env.*
+!.env.example
 docker-compose.override.yml
 
-# ======================================
-# 🧼 MISC CLEANUP
-# ======================================
+# Misc cleanup
 
 # Backups and temporary exports
 *.bak

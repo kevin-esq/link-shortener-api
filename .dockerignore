@@ -1,0 +1,64 @@
+# Docker Ignore File
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Test results
+**/TestResults/
+**/*.trx
+
+# NuGet packages
+*.nupkg
+packages/
+
+# Logs
+*.log
+
+# Secrets and config
+.env
+.env.*
+!.env.example
+appsettings.json
+appsettings.Development.json
+**/Keys/
+**/*.pem
+**/*.key
+**/*.pfx
+
+# Documentation
+*.md
+!README.md
+LICENSE
+
+# Docker files (no need to copy to build context)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
