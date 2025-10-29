@@ -1,37 +1,55 @@
 ﻿using LinkShortener.Application.Abstractions.Services;
-using System.Net;
-using System.Net.Mail;
+using Microsoft.Extensions.Logging;
+using Resend;
 
 namespace LinkShortener.Infrastructure.Services
 {
     /// <summary>
-    /// Provides functionality to send emails such as verification or password reset codes.
+    /// Provides functionality to send emails using Resend API.
+    /// Falls back to console logging if Resend API key is not configured.
     /// </summary>
     public class EmailService : IEmailService
     {
-        private readonly SmtpClient _smtpClient;
+        private readonly IResend? _resend;
         private readonly string _fromAddress;
+        private readonly ILogger<EmailService> _logger;
+        private readonly bool _isConfigured;
 
         /// <summary>
         /// Initializes a new instance of <see cref="EmailService"/>.
         /// </summary>
-        /// <param name="host">SMTP host address.</param>
-        /// <param name="port">SMTP port.</param>
-        /// <param name="username">SMTP username (usually an email address).</param>
-        /// <param name="password">SMTP password or app-specific token.</param>
-        /// <param name="fromAddress">The address from which emails will be sent.</param>
-        public EmailService(string host, int port, string username, string password, string fromAddress)
+        /// <param name="resendApiKey">Resend API key (starts with 're_').</param>
+        /// <param name="fromAddress">The email address from which emails will be sent.</param>
+        /// <param name="logger">Logger instance.</param>
+        public EmailService(string? resendApiKey, string fromAddress, ILogger<EmailService> logger)
         {
             _fromAddress = fromAddress;
-            _smtpClient = new SmtpClient(host, port)
+            _logger = logger;
+
+            // Check if Resend API is properly configured
+            _isConfigured = !string.IsNullOrWhiteSpace(resendApiKey);
+
+            if (_isConfigured)
             {
-                Credentials = new NetworkCredential(username, password),
-                EnableSsl = true
-            };
+                try
+                {
+                    _resend = ResendClient.Create(resendApiKey!);
+                    _logger.LogInformation("✅ Resend email client initialized successfully");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to initialize Resend client. Email logging will be used instead.");
+                    _isConfigured = false;
+                }
+            }
+            else
+            {
+                _logger.LogWarning("⚠️ Resend API key not configured. Emails will be logged to console instead.");
+            }
         }
 
         /// <summary>
-        /// Sends an email asynchronously.
+        /// Sends an email asynchronously or logs it if Resend API is not configured.
         /// </summary>
         /// <param name="to">Recipient email address.</param>
         /// <param name="subject">Email subject line.</param>
@@ -39,14 +57,39 @@ namespace LinkShortener.Infrastructure.Services
         /// <param name="isHtml">Indicates whether the body contains HTML content.</param>
         public async Task SendAsync(string to, string subject, string body, bool isHtml = false)
         {
-            using var message = new MailMessage(_fromAddress, to)
+            if (!_isConfigured || _resend == null)
             {
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = isHtml
-            };
+                // Log email instead of sending
+                _logger.LogWarning(
+                    "📧 EMAIL NOT SENT (Resend API not configured)\n" +
+                    "To: {To}\n" +
+                    "From: {From}\n" +
+                    "Subject: {Subject}\n" +
+                    "Body: {Body}",
+                    to, _fromAddress, subject, body
+                );
+                return;
+            }
 
-            await _smtpClient.SendMailAsync(message);
+            try
+            {
+                var message = new EmailMessage
+                {
+                    From = _fromAddress,
+                    To = to,
+                    Subject = subject,
+                    HtmlBody = isHtml ? body : null,
+                    TextBody = !isHtml ? body : null
+                };
+
+                var response = await _resend.EmailSendAsync(message);
+                _logger.LogInformation("✅ Email sent successfully to {To} via Resend", to);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Unexpected error sending email to {To}", to);
+                throw;
+            }
         }
     }
 }

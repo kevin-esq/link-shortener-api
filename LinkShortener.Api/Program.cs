@@ -177,14 +177,18 @@ builder.Services.AddSingleton<IJwtValidator>(new JwtValidator(new TokenValidatio
 
 builder.Services.AddMemoryCache();
 
-var emailConfig = builder.Configuration.GetSection("Email");
-builder.Services.AddSingleton<IEmailService>(new EmailService(
-    host: emailConfig["Host"]!,
-    port: int.Parse(emailConfig["Port"]!),
-    username: emailConfig["Username"]!,
-    password: emailConfig["Password"]!,
-    fromAddress: emailConfig["FromAddress"]!
-));
+builder.Services.AddSingleton<IEmailService>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<EmailService>>();
+    var resendApiKey = builder.Configuration["Resend:ApiKey"];
+    var fromAddress = builder.Configuration["Email:FromAddress"] ?? "onboarding@resend.dev";
+    
+    return new EmailService(
+        resendApiKey: resendApiKey,
+        fromAddress: fromAddress,
+        logger: logger
+    );
+});
 
 builder.Services.AddSingleton<IVerificationCodeStore, VerificationCodeStore>();
 
