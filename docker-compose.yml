@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # ======================================
+  # 🐘 PostgreSQL Database (LOCAL ONLY)
+  # ======================================
+  # Uncomment this service if you want to use local PostgreSQL instead of Supabase
+  # Also update .env to use: Host=postgres;Port=5432;Database=LinkShortenerDb
+  
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: linkshortener-db
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB:-LinkShortenerDb}
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - linkshortener-network
+
+  # ======================================
+  # 🔴 Redis Cache
+  # ======================================
+  redis:
+    image: redis:7-alpine
+    container_name: linkshortener-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - linkshortener-network
+
+  # ======================================
+  # 🚀 LinkShortener API
+  # ======================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: linkshortener-api
+    extra_hosts:
+      - "db.scwfucxtyevazphkvklj.supabase.co:host-gateway"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      # Database - Uses external database from .env (Supabase or other)
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+      - ConnectionStrings__Redis=redis:6379
+      
+      # JWT
+      - Jwt__Issuer=${Jwt__Issuer:-LinkShortener}
+      - Jwt__Audience=${Jwt__Audience:-LinkShortenerClient}
+      - Jwt__KeysFolder=/app/Keys
+      
+      # Email
+      - Email__Host=${Email__Host}
+      - Email__Port=${Email__Port:-587}
+      - Email__Username=${Email__Username}
+      - Email__Password=${Email__Password}
+      - Email__FromAddress=${Email__FromAddress}
+      
+      # Google OAuth
+      - Google__ClientId=${Google__ClientId}
+      
+      # ASP.NET Core
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - ASPNETCORE_URLS=http://+:8080
+      - AllowedHosts=*
+      
+      # Logging
+      - Logging__LogLevel__Default=${Logging__LogLevel__Default:-Information}
+      - Logging__LogLevel__Microsoft.AspNetCore=${Logging__LogLevel__Microsoft_AspNetCore:-Warning}
+      - Logging__LogLevel__Microsoft.EntityFrameworkCore=${Logging__LogLevel__Microsoft_EntityFrameworkCore:-Warning}
+    ports:
+      - "8080:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+      # If using local postgres, uncomment:
+      # postgres:
+      #   condition: service_healthy
+    volumes:
+      - jwt_keys:/app/Keys
+    networks:
+      - linkshortener-network
+    restart: unless-stopped
+
+# ======================================
+# 📦 Volumes
+# ======================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  jwt_keys:
+    driver: local
+
+# ======================================
+# 🌐 Networks
+# ======================================
+networks:
+  linkshortener-network:
+    driver: bridge

@@ -104,9 +104,9 @@ var issuer = jwtConfig["Issuer"] ?? throw new InvalidOperationException("Missing
 var audience = jwtConfig["Audience"] ?? throw new InvalidOperationException("Missing Jwt:Audience");
 var keysFolderConfig = jwtConfig["KeysFolder"] ?? throw new InvalidOperationException("Missing Jwt:KeysFolder");
 
-var keysFolder = Path.GetFullPath(
-    Path.Combine(builder.Environment.ContentRootPath, keysFolderConfig)
-);
+var keysFolder = Path.IsPathRooted(keysFolderConfig)
+    ? keysFolderConfig
+    : Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, keysFolderConfig));
 
 Console.WriteLine($"🔑 Searching for RSA keys in: {keysFolder}");
 
@@ -206,15 +206,17 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<AuditMiddleware>();
 
+// Enable Swagger in all environments
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LinkShortener API v1");
+    c.DocumentTitle = "LinkShortener API Docs";
+});
+
+// Auto-migrate database in development
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "LinkShortener API v1");
-        c.DocumentTitle = "LinkShortener API Docs";
-    });
-
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.MigrateAsync();
