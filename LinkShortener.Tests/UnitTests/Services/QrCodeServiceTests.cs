@@ -16,7 +16,7 @@ namespace LinkShortener.Tests.UnitTests.Services
         public void GenerateQrCode_ValidUrl_ReturnsBytes()
         {
             var url = "https://example.com";
-            
+
             var result = _service.GenerateQrCode(url, 300);
 
             Assert.NotNull(result);
@@ -27,7 +27,7 @@ namespace LinkShortener.Tests.UnitTests.Services
         public void GenerateQrCode_CustomSize_ReturnsBytes()
         {
             var url = "https://example.com";
-            
+
             var result = _service.GenerateQrCode(url, 500);
 
             Assert.NotNull(result);
@@ -38,7 +38,7 @@ namespace LinkShortener.Tests.UnitTests.Services
         public void GenerateQrCodeBase64_ValidUrl_ReturnsBase64String()
         {
             var url = "https://example.com";
-            
+
             var result = _service.GenerateQrCodeBase64(url, 300);
 
             Assert.NotNull(result);
@@ -50,7 +50,7 @@ namespace LinkShortener.Tests.UnitTests.Services
         public void GenerateQrCode_LongUrl_ReturnsBytes()
         {
             var url = "https://example.com/very/long/path/with/many/segments/and/query?param1=value1&param2=value2&param3=value3";
-            
+
             var result = _service.GenerateQrCode(url);
 
             Assert.NotNull(result);

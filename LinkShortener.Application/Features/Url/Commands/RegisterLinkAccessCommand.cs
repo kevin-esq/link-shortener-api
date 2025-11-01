@@ -1,4 +1,4 @@
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Commands
 {
@@ -8,5 +8,5 @@ namespace LinkShortener.Application.Features.Url.Commands
         string UserAgent,
         Guid? UserId = null,
         string? Referer = null
-    ) : IRequest<Unit>;
+    ) : ICommand;
 }

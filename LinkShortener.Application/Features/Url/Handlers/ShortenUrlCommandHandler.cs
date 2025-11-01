@@ -2,11 +2,11 @@ using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Commands;
 using LinkShortener.Application.Features.Url.DTOs;
 using LinkShortener.Domain.Entities;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Handlers
 {
-    public class ShortenUrlCommandHandler : IRequestHandler<ShortenUrlCommand, ShortenUrlResponse>
+    public class ShortenUrlCommandHandler : ICommandHandler<ShortenUrlCommand, ShortenUrlResponse>
     {
         private readonly IUrlRepository _repository;
 
@@ -15,7 +15,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
             _repository = repository;
         }
 
-        public async Task<ShortenUrlResponse> Handle(ShortenUrlCommand request, CancellationToken cancellationToken)
+        public async Task<ShortenUrlResponse> HandleAsync(ShortenUrlCommand request, CancellationToken cancellationToken)
         {
             if (!Uri.TryCreate(request.OriginalUrl, UriKind.Absolute, out _))
                 throw new ArgumentException("Invalid URL format.", nameof(request.OriginalUrl));

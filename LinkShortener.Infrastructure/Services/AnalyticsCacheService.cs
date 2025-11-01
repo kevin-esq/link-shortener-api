@@ -38,7 +38,7 @@ namespace LinkShortener.Infrastructure.Services
                 var db = _redis.GetDatabase();
                 var listKey = $"analytics:events:{linkId}";
                 await db.ListRightPushAsync(listKey, eventData);
-                
+
                 // Set expiration for the list (1 hour)
                 await db.KeyExpireAsync(listKey, TimeSpan.FromHours(1));
             }

@@ -147,8 +147,8 @@ namespace LinkShortener.Infrastructure.Repositories
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var searchLower = search.ToLower();
-                query = query.Where(l => 
-                    l.Code.ToLower().Contains(searchLower) || 
+                query = query.Where(l =>
+                    l.Code.ToLower().Contains(searchLower) ||
                     l.LongUrl.ToLower().Contains(searchLower) ||
                     l.ShortUrl.ToLower().Contains(searchLower));
             }

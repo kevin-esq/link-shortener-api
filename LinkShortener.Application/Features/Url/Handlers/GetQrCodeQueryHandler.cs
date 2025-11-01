@@ -1,10 +1,10 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Queries;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Handlers
 {
-    public class GetQrCodeQueryHandler : IRequestHandler<GetQrCodeQuery, QrCodeResponse?>
+    public class GetQrCodeQueryHandler : IQueryHandler<GetQrCodeQuery, QrCodeResponse?>
     {
         private readonly IUrlRepository _repository;
         private readonly IQrCodeService _qrCodeService;
@@ -15,7 +15,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
             _qrCodeService = qrCodeService;
         }
 
-        public async Task<QrCodeResponse?> Handle(GetQrCodeQuery request, CancellationToken cancellationToken)
+        public async Task<QrCodeResponse?> HandleAsync(GetQrCodeQuery request, CancellationToken cancellationToken)
         {
             var link = await _repository.GetByCodeAsync(request.Code, cancellationToken);
 

@@ -81,7 +81,7 @@ namespace LinkShortener.Infrastructure.Services
 
                 _context.ClickEvents.Add(clickEvent);
                 await _context.SaveChangesAsync(cancellationToken);
-                
+
                 _logger.LogInformation("Click event recorded: LinkId={LinkId}, Code={Code}", linkId, shortCode);
             }
             catch (Exception ex)

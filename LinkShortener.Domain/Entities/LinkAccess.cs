@@ -11,9 +11,9 @@ namespace LinkShortener.Domain.Entities
         private LinkAccess() { }
 
         public LinkAccess(
-            Guid linkId, 
-            Guid? userId, 
-            string ipAddress, 
+            Guid linkId,
+            Guid? userId,
+            string ipAddress,
             string userAgent,
             string? referer = null,
             string? country = null,
@@ -47,16 +47,16 @@ namespace LinkShortener.Domain.Entities
         public User? User { get; private set; }
 
         public DateTime AccessedOnUtc { get; private set; }
-        
+
         // Basic tracking
         public string IpAddress { get; private set; } = string.Empty;
         public string UserAgent { get; private set; } = string.Empty;
         public string? Referer { get; private set; }
-        
+
         // Geographic data
         public string? Country { get; private set; }
         public string? City { get; private set; }
-        
+
         // Browser & Device analytics
         public string? Browser { get; private set; }
         public string? BrowserVersion { get; private set; }

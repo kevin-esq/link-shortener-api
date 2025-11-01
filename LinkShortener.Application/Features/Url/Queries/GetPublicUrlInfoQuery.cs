@@ -1,7 +1,7 @@
-﻿using LinkShortener.Application.Features.Url.DTOs;
-using MediatR;
+using LinkShortener.Application.Features.Url.DTOs;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Queries
 {
-    public record GetPublicUrlInfoQuery(string Code, string Scheme, string Host) : IRequest<GetUrlInfoResponse?>;
+    public record GetPublicUrlInfoQuery(string Code, string Scheme, string Host) : IQuery<GetUrlInfoResponse?>;
 }

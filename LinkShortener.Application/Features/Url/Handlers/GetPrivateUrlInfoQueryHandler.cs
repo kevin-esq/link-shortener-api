@@ -1,11 +1,11 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.DTOs;
 using LinkShortener.Application.Features.Url.Queries;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Handlers
 {
-    public class GetPrivateUrlInfoQueryHandler : IRequestHandler<GetPrivateUrlInfoQuery, GetUrlInfoResponse?>
+    public class GetPrivateUrlInfoQueryHandler : IQueryHandler<GetPrivateUrlInfoQuery, GetUrlInfoResponse?>
     {
         private readonly IUrlRepository _repository;
 
@@ -14,7 +14,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
             _repository = repository;
         }
 
-        public async Task<GetUrlInfoResponse?> Handle(GetPrivateUrlInfoQuery request, CancellationToken cancellationToken)
+        public async Task<GetUrlInfoResponse?> HandleAsync(GetPrivateUrlInfoQuery request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.Code))
                 throw new ArgumentException("Code cannot be null or empty.", nameof(request.Code));

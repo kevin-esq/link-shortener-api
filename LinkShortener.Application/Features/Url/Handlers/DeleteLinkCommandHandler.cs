@@ -1,10 +1,10 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Commands;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Handlers
 {
-    public class DeleteLinkCommandHandler : IRequestHandler<DeleteLinkCommand, bool>
+    public class DeleteLinkCommandHandler : ICommandHandler<DeleteLinkCommand, bool>
     {
         private readonly IUrlRepository _repository;
 
@@ -13,7 +13,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
             _repository = repository;
         }
 
-        public async Task<bool> Handle(DeleteLinkCommand request, CancellationToken cancellationToken)
+        public async Task<bool> HandleAsync(DeleteLinkCommand request, CancellationToken cancellationToken)
         {
             return await _repository.DeleteLinkAsync(request.Code, request.UserId, cancellationToken);
         }

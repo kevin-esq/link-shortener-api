@@ -3,12 +3,12 @@ using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using LinkShortener.Domain.Entities;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, LoginUserResponse>
+    public class RefreshTokenCommandHandler : ICommandHandler<RefreshTokenCommand, LoginUserResponse>
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IJwtService _jwtService;
@@ -24,7 +24,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _logger = logger;
         }
 
-        public async Task<LoginUserResponse> Handle(RefreshTokenCommand request, CancellationToken ct)
+        public async Task<LoginUserResponse> HandleAsync(RefreshTokenCommand request, CancellationToken ct)
         {
             var storedToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, ct);
 

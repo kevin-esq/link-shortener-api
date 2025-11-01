@@ -1,5 +1,5 @@
 using LinkShortener.Application.Features.Analytics.DTOs;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Analytics.Queries
 {
@@ -9,5 +9,5 @@ namespace LinkShortener.Application.Features.Analytics.Queries
     public record GetLinkAnalyticsQuery(
         Guid LinkId,
         int DaysToAnalyze = 30
-    ) : IRequest<LinkAnalyticsDto?>;
+    ) : IQuery<LinkAnalyticsDto?>;
 }

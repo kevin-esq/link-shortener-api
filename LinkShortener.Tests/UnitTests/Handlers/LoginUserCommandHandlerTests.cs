@@ -36,7 +36,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new LoginUserCommand("test@example.com", "password123");
 
             // Act
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -69,7 +69,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
 
         [Fact]
@@ -101,7 +101,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
     }
 }

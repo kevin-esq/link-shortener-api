@@ -1,7 +1,7 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Commands;
 using LinkShortener.Domain.Entities;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Handlers
 {
@@ -9,7 +9,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
     /// Handler for registering link access events with enhanced analytics data.
     /// Part of the LinkPulse analytics system.
     /// </summary>
-    public class RegisterLinkAccessCommandHandler : IRequestHandler<RegisterLinkAccessCommand, Unit>
+    public class RegisterLinkAccessCommandHandler : ICommandHandler<RegisterLinkAccessCommand>
     {
         private readonly IUrlRepository _repository;
         private readonly IUserAgentParser _userAgentParser;
@@ -25,7 +25,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
             _geolocationService = geolocationService;
         }
 
-        public async Task<Unit> Handle(RegisterLinkAccessCommand request, CancellationToken cancellationToken)
+        public async Task HandleAsync(RegisterLinkAccessCommand request, CancellationToken cancellationToken)
         {
             var link = await _repository.GetByIdAsync(request.LinkId, cancellationToken);
             if (link == null)
@@ -55,8 +55,6 @@ namespace LinkShortener.Application.Features.Url.Handlers
 
             await _repository.AddAccessAsync(access, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
         }
     }
 }

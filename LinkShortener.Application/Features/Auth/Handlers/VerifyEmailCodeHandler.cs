@@ -1,12 +1,12 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class VerifyEmailCodeHandler : IRequestHandler<VerifyEmailCodeCommand, bool>
+    public class VerifyEmailCodeHandler : ICommandHandler<VerifyEmailCodeCommand, bool>
     {
         private readonly IVerificationCodeStore _codeStore;
         private readonly IUserRepository _userRepository;
@@ -22,7 +22,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _logger = logger;
         }
 
-        public async Task<bool> Handle(VerifyEmailCodeCommand request, CancellationToken ct)
+        public async Task<bool> HandleAsync(VerifyEmailCodeCommand request, CancellationToken ct)
         {
             var storedCode = await _codeStore.GetCodeAsync(request.Email, ct);
             if (storedCode == null || storedCode != request.Code)
