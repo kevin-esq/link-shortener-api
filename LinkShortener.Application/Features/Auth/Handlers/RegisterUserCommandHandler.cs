@@ -5,13 +5,13 @@ using LinkShortener.Application.Common.Validators;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using LinkShortener.Domain.Entities;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, RegisterUserResponse>
+    public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, RegisterUserResponse>
     {
         private readonly IUserRepository _repository;
         private readonly IEmailService _emailService;
@@ -36,7 +36,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _logger = logger;
         }
 
-        public async Task<RegisterUserResponse> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+        public async Task<RegisterUserResponse> HandleAsync(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             if (await _repository.ExistsByEmailAsync(request.Email, cancellationToken))
                 throw new ArgumentException("Email already registered");

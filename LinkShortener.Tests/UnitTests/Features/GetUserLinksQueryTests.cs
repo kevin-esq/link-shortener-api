@@ -38,7 +38,7 @@ namespace LinkShortener.Tests.UnitTests.Features
                 .ReturnsAsync((links, 1));
 
             var query = new GetUserLinksQuery(userId, 1, 20);
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.HandleAsync(query, CancellationToken.None);
 
             Assert.Single(result.Links);
             Assert.Equal(1, result.TotalCount);
@@ -49,13 +49,13 @@ namespace LinkShortener.Tests.UnitTests.Features
         public async Task Handle_WithSearch_CallsRepositoryWithSearch()
         {
             var userId = Guid.NewGuid();
-            
+
             _repositoryMock
                 .Setup(r => r.GetUserLinksPagedAsync(userId, 1, 20, "google", "createdAt", "desc", It.IsAny<CancellationToken>()))
                 .ReturnsAsync((new List<LinkWithStats>(), 0));
 
             var query = new GetUserLinksQuery(userId, 1, 20, "google");
-            await _handler.Handle(query, CancellationToken.None);
+            await _handler.HandleAsync(query, CancellationToken.None);
 
             _repositoryMock.Verify(r => r.GetUserLinksPagedAsync(
                 userId, 1, 20, "google", "createdAt", "desc", It.IsAny<CancellationToken>()), Times.Once);
@@ -65,13 +65,13 @@ namespace LinkShortener.Tests.UnitTests.Features
         public async Task Handle_WithOrderBy_CallsRepositoryWithOrderBy()
         {
             var userId = Guid.NewGuid();
-            
+
             _repositoryMock
                 .Setup(r => r.GetUserLinksPagedAsync(userId, 1, 20, null, "clicks", "desc", It.IsAny<CancellationToken>()))
                 .ReturnsAsync((new List<LinkWithStats>(), 0));
 
             var query = new GetUserLinksQuery(userId, 1, 20, null, "clicks", "desc");
-            await _handler.Handle(query, CancellationToken.None);
+            await _handler.HandleAsync(query, CancellationToken.None);
 
             _repositoryMock.Verify(r => r.GetUserLinksPagedAsync(
                 userId, 1, 20, null, "clicks", "desc", It.IsAny<CancellationToken>()), Times.Once);
@@ -81,13 +81,13 @@ namespace LinkShortener.Tests.UnitTests.Features
         public async Task Handle_CalculatesTotalPages_Correctly()
         {
             var userId = Guid.NewGuid();
-            
+
             _repositoryMock
                 .Setup(r => r.GetUserLinksPagedAsync(userId, 1, 20, null, "createdAt", "desc", It.IsAny<CancellationToken>()))
                 .ReturnsAsync((new List<LinkWithStats>(), 45));
 
             var query = new GetUserLinksQuery(userId, 1, 20);
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.HandleAsync(query, CancellationToken.None);
 
             Assert.Equal(45, result.TotalCount);
             Assert.Equal(3, result.TotalPages);

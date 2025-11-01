@@ -28,8 +28,8 @@ namespace LinkShortener.Infrastructure.Services
                 var clientInfo = _parser.Parse(userAgent);
 
                 var browser = clientInfo.UA.Family != "Other" ? clientInfo.UA.Family : null;
-                var browserVersion = !string.IsNullOrEmpty(clientInfo.UA.Major) 
-                    ? $"{clientInfo.UA.Major}.{clientInfo.UA.Minor}" 
+                var browserVersion = !string.IsNullOrEmpty(clientInfo.UA.Major)
+                    ? $"{clientInfo.UA.Major}.{clientInfo.UA.Minor}"
                     : null;
 
                 var os = clientInfo.OS.Family != "Other" ? clientInfo.OS.Family : null;

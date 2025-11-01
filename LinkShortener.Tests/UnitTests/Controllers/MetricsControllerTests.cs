@@ -110,7 +110,7 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task GetRecentClicks_CustomLimit_UsesProvidedLimit()
         {
             var linkId = Guid.NewGuid();
-            
+
             _clickEventServiceMock
                 .Setup(s => s.GetRecentClicksAsync(linkId, 50, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ClickEventDto>());

@@ -36,7 +36,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new RefreshTokenCommand("valid_refresh_token");
 
             // Act
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -65,7 +65,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
     }
 }

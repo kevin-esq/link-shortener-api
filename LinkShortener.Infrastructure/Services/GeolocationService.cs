@@ -25,7 +25,7 @@ namespace LinkShortener.Infrastructure.Services
         {
             // Basic implementation - returns Unknown for now
             // TODO: Integrate with external geolocation API
-            
+
             if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress == "unknown")
             {
                 return Task.FromResult(new GeolocationInfo("Unknown", "Unknown"));

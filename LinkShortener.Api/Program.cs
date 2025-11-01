@@ -7,9 +7,11 @@ using LinkShortener.Infrastructure;
 using LinkShortener.Infrastructure.Repositories;
 using LinkShortener.Infrastructure.Security;
 using LinkShortener.Infrastructure.Services;
+using LiteBus.Commands.Extensions.MicrosoftDependencyInjection;
+using LiteBus.Messaging.Extensions.MicrosoftDependencyInjection;
+using LiteBus.Queries.Extensions.MicrosoftDependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -77,7 +79,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")!)
 );
 
-// Redis connection (optional - for analytics caching)
+// Redis connection
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrEmpty(redisConnectionString))
 {
@@ -182,7 +184,7 @@ builder.Services.AddSingleton<IEmailService>(sp =>
     var logger = sp.GetRequiredService<ILogger<EmailService>>();
     var resendApiKey = builder.Configuration["Resend:ApiKey"];
     var fromAddress = builder.Configuration["Email:FromAddress"] ?? "onboarding@resend.dev";
-    
+
     return new EmailService(
         resendApiKey: resendApiKey,
         fromAddress: fromAddress,
@@ -197,9 +199,18 @@ var googleClientId = builder.Configuration["Google:ClientId"]
 builder.Services.AddSingleton<IGoogleAuthService>(sp =>
     new GoogleAuthService(googleClientId, sp.GetRequiredService<ILogger<GoogleAuthService>>()));
 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(ShortenUrlCommandHandler).Assembly)
-);
+builder.Services.AddLiteBus(liteBus =>
+{
+    liteBus.AddCommandModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ShortenUrlCommandHandler).Assembly);
+    });
+
+    liteBus.AddQueryModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ShortenUrlCommandHandler).Assembly);
+    });
+});
 
 // Background services
 builder.Services.AddHostedService<AnalyticsBackgroundService>();

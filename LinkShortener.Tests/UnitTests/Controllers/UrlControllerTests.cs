@@ -3,12 +3,13 @@ using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Commands;
 using LinkShortener.Application.Features.Url.DTOs;
 using LinkShortener.Application.Features.Url.Queries;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System.Security.Claims;
 using Xunit;
+using LiteBus.Commands.Abstractions;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Tests.UnitTests.Controllers
 {
@@ -18,7 +19,9 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task ShortenUrl_ValidRequest_ReturnsOkResult()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var userId = Guid.NewGuid();
             var expectedResponse = new ShortenUrlResponse
             {
@@ -27,12 +30,11 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 ShortUrl = "https://localhost:7205/s/ABC1234"
             };
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<ShortenUrlCommand>(), It.IsAny<CancellationToken>()))
+            mockCommandMediator.Setup(m => m.SendAsync(It.IsAny<ShortenUrlCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
             var mockClickEventService = new Mock<IClickEventService>();
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             // Setup HttpContext with user claims
             var claims = new List<Claim>
@@ -54,16 +56,18 @@ namespace LinkShortener.Tests.UnitTests.Controllers
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
-            mockMediator.Verify(m => m.Send(It.IsAny<ShortenUrlCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockCommandMediator.Verify(m => m.SendAsync(It.IsAny<ShortenUrlCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task ShortenUrl_EmptyUrl_ReturnsBadRequest()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var mockClickEventService = new Mock<IClickEventService>();
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
             var request = new ShortenUrlRequest { Url = "" };
 
             // Act
@@ -77,7 +81,9 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task RedirectToLongUrl_ValidCode_ReturnsRedirect()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var response = new GetUrlInfoResponse
             {
                 Id = Guid.NewGuid(),
@@ -86,16 +92,15 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetPublicUrlInfoQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetPublicUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<RegisterLinkAccessCommand>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(Unit.Value));
+            mockCommandMediator
+                .Setup(m => m.SendAsync(It.IsAny<RegisterLinkAccessCommand>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var mockClickEventService = new Mock<IClickEventService>();
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -113,14 +118,15 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task RedirectToLongUrl_InvalidCode_ReturnsNotFound()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetPublicUrlInfoQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetPublicUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetUrlInfoResponse?)null);
 
             var mockClickEventService = new Mock<IClickEventService>();
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext()
@@ -137,7 +143,9 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task GetInfo_ValidCode_ReturnsOkResult()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var userId = Guid.NewGuid();
             var response = new GetUrlInfoResponse
             {
@@ -147,12 +155,11 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetPrivateUrlInfoQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetPrivateUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
             var mockClickEventService = new Mock<IClickEventService>();
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -177,15 +184,16 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task GetInfo_InvalidCode_ReturnsNotFound()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var userId = Guid.NewGuid();
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetPrivateUrlInfoQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetPrivateUrlInfoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetUrlInfoResponse?)null);
 
             var mockClickEventService = new Mock<IClickEventService>();
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -209,7 +217,9 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         [Fact]
         public async Task GetMyLinks_ReturnsOk_WithPaginatedLinks()
         {
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var mockClickEventService = new Mock<IClickEventService>();
             var userId = Guid.NewGuid();
 
@@ -230,11 +240,10 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 20,
                 1);
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetUserLinksQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetUserLinksQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -259,15 +268,16 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         [Fact]
         public async Task DeleteLink_ValidCode_ReturnsNoContent()
         {
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var mockClickEventService = new Mock<IClickEventService>();
             var userId = Guid.NewGuid();
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<DeleteLinkCommand>(), It.IsAny<CancellationToken>()))
+            mockCommandMediator.Setup(m => m.SendAsync(It.IsAny<DeleteLinkCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -284,23 +294,23 @@ namespace LinkShortener.Tests.UnitTests.Controllers
             var result = await controller.DeleteLink("ABC123", CancellationToken.None);
 
             Assert.IsType<NoContentResult>(result);
-            mockMediator.Verify(m => m.Send(
-                It.Is<DeleteLinkCommand>(cmd => cmd.Code == "ABC123" && cmd.UserId == userId),
+            mockCommandMediator.Verify(m => m.SendAsync(It.Is<DeleteLinkCommand>(cmd => cmd.Code == "ABC123" && cmd.UserId == userId),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task DeleteLink_NotFound_ReturnsNotFound()
         {
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var mockClickEventService = new Mock<IClickEventService>();
             var userId = Guid.NewGuid();
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<DeleteLinkCommand>(), It.IsAny<CancellationToken>()))
+            mockCommandMediator.Setup(m => m.SendAsync(It.IsAny<DeleteLinkCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -322,7 +332,9 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         [Fact]
         public async Task GetLinkStats_ValidCode_ReturnsStats()
         {
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var mockClickEventService = new Mock<IClickEventService>();
             var userId = Guid.NewGuid();
 
@@ -338,11 +350,10 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 new List<BrowserClicksDto> { new BrowserClicksDto("Chrome", 80, 80.0) },
                 new List<RefererClicksDto>());
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetLinkStatsQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetLinkStatsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {
@@ -368,15 +379,16 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         [Fact]
         public async Task GetLinkStats_NotFound_ReturnsNotFound()
         {
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            var mockQueryMediator = new Mock<IQueryMediator>();
+            var mockUrlRepository = new Mock<IUrlRepository>();
             var mockClickEventService = new Mock<IClickEventService>();
             var userId = Guid.NewGuid();
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<GetLinkStatsQuery>(), It.IsAny<CancellationToken>()))
+            mockQueryMediator.Setup(m => m.QueryAsync(It.IsAny<GetLinkStatsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((LinkStatsResponse?)null);
 
-            var controller = new UrlController(mockMediator.Object, mockClickEventService.Object);
+            var controller = new UrlController(mockUrlRepository.Object, mockCommandMediator.Object, mockQueryMediator.Object, mockClickEventService.Object);
 
             var claims = new List<Claim>
             {

@@ -8,6 +8,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
+		<PackageReference Include="LiteBus" Version="3.1.0" />
+		<PackageReference Include="LiteBus.Commands" Version="3.1.0" />
+		<PackageReference Include="LiteBus.Queries" Version="3.1.0" />
+		<PackageReference Include="LiteBus.Extensions.MicrosoftDependencyInjection" Version="3.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.20" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">

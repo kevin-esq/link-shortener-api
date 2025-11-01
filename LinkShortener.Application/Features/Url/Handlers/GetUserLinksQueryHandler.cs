@@ -1,10 +1,10 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Queries;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Handlers
 {
-    public class GetUserLinksQueryHandler : IRequestHandler<GetUserLinksQuery, UserLinksResponse>
+    public class GetUserLinksQueryHandler : IQueryHandler<GetUserLinksQuery, UserLinksResponse>
     {
         private readonly IUrlRepository _repository;
 
@@ -13,7 +13,7 @@ namespace LinkShortener.Application.Features.Url.Handlers
             _repository = repository;
         }
 
-        public async Task<UserLinksResponse> Handle(GetUserLinksQuery request, CancellationToken cancellationToken)
+        public async Task<UserLinksResponse> HandleAsync(GetUserLinksQuery request, CancellationToken cancellationToken)
         {
             var (links, totalCount) = await _repository.GetUserLinksPagedAsync(
                 request.UserId,

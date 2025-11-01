@@ -1,14 +1,14 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Analytics.DTOs;
 using LinkShortener.Application.Features.Analytics.Queries;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Analytics.Handlers
 {
     /// <summary>
     /// Handler for retrieving comprehensive analytics for a specific link.
     /// </summary>
-    public class GetLinkAnalyticsQueryHandler : IRequestHandler<GetLinkAnalyticsQuery, LinkAnalyticsDto?>
+    public class GetLinkAnalyticsQueryHandler : IQueryHandler<GetLinkAnalyticsQuery, LinkAnalyticsDto?>
     {
         private readonly IAnalyticsRepository _analyticsRepository;
         private readonly IAnalyticsCacheService _cacheService;
@@ -21,7 +21,7 @@ namespace LinkShortener.Application.Features.Analytics.Handlers
             _cacheService = cacheService;
         }
 
-        public async Task<LinkAnalyticsDto?> Handle(GetLinkAnalyticsQuery request, CancellationToken cancellationToken)
+        public async Task<LinkAnalyticsDto?> HandleAsync(GetLinkAnalyticsQuery request, CancellationToken cancellationToken)
         {
             // Try to get from cache first
             var cacheKey = $"analytics:link:{request.LinkId}:days:{request.DaysToAnalyze}";
@@ -32,17 +32,17 @@ namespace LinkShortener.Application.Features.Analytics.Handlers
 
             // Get from database
             var analytics = await _analyticsRepository.GetLinkAnalyticsAsync(
-                request.LinkId, 
-                request.DaysToAnalyze, 
+                request.LinkId,
+                request.DaysToAnalyze,
                 cancellationToken);
 
             // Cache for 5 minutes
             if (analytics != null)
             {
                 await _cacheService.SetAnalyticsAsync(
-                    cacheKey, 
-                    analytics, 
-                    TimeSpan.FromMinutes(5), 
+                    cacheKey,
+                    analytics,
+                    TimeSpan.FromMinutes(5),
                     cancellationToken);
             }
 

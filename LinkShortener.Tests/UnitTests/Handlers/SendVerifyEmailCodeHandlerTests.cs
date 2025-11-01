@@ -32,7 +32,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new SendVerifyEmailCodeCommand("test@example.com");
 
             // Act
-            await handler.Handle(command, CancellationToken.None);
+            await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             mockCodeStore.Verify(s => s.SaveCodeAsync(
@@ -70,7 +70,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
     }
 }

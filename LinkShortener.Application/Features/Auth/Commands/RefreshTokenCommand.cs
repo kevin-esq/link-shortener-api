@@ -1,7 +1,7 @@
 using LinkShortener.Application.Features.Auth.DTOs;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Auth.Commands
 {
-    public record RefreshTokenCommand(string RefreshToken) : IRequest<LoginUserResponse>;
+    public record RefreshTokenCommand(string RefreshToken) : ICommand<LoginUserResponse>;
 }

@@ -11,8 +11,8 @@ namespace LinkShortener.Application.Abstractions
         Task SaveChangesAsync(CancellationToken cancellationToken);
         Task<bool> IsUnique(string code, CancellationToken cancellationToken);
         Task<(List<LinkWithStats> links, int totalCount)> GetUserLinksPagedAsync(
-            Guid userId, 
-            int page, 
+            Guid userId,
+            int page,
             int pageSize,
             string? search,
             string? orderBy,

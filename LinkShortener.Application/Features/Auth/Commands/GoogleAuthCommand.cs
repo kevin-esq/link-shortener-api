@@ -1,7 +1,7 @@
 using LinkShortener.Application.Features.Auth.DTOs;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Auth.Commands
 {
-    public record GoogleAuthCommand(string IdToken) : IRequest<LoginUserResponse>;
+    public record GoogleAuthCommand(string IdToken) : ICommand<LoginUserResponse>;
 }

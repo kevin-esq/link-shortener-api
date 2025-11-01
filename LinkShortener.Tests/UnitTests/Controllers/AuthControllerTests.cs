@@ -1,7 +1,7 @@
 using LinkShortener.Api.Controllers;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -14,18 +14,18 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task Register_ValidRequest_ReturnsOkResult()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
             var expectedResponse = new RegisterUserResponse(
                 Guid.NewGuid(),
                 "testuser",
                 "test@example.com",
                 false);
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<RegisterUserCommand>(), It.IsAny<CancellationToken>()))
+            mockCommandMediator
+                .Setup(m => m.SendAsync(It.IsAny<RegisterUserCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
-            var controller = new AuthController(mockMediator.Object);
+            var controller = new AuthController(mockCommandMediator.Object);
             var request = new RegisterUserRequest(
                 "testuser",
                 "test@example.com",
@@ -36,14 +36,14 @@ namespace LinkShortener.Tests.UnitTests.Controllers
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
-            mockMediator.Verify(m => m.Send(It.IsAny<RegisterUserCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockCommandMediator.Verify(m => m.SendAsync(It.IsAny<RegisterUserCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task Login_ValidRequest_ReturnsOkResult()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
             var expectedResponse = new LoginUserResponse(
                 Guid.NewGuid(),
                 "testuser",
@@ -51,11 +51,11 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 "mock_token",
                 "mock_refresh_token");
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<LoginUserCommand>(), It.IsAny<CancellationToken>()))
+            mockCommandMediator
+                .Setup(m => m.SendAsync(It.IsAny<LoginUserCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
-            var controller = new AuthController(mockMediator.Object);
+            var controller = new AuthController(mockCommandMediator.Object);
             var request = new LoginUserRequest(
                 "test@example.com",
                 "password123");
@@ -65,14 +65,14 @@ namespace LinkShortener.Tests.UnitTests.Controllers
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
-            mockMediator.Verify(m => m.Send(It.IsAny<LoginUserCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockCommandMediator.Verify(m => m.SendAsync(It.IsAny<LoginUserCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task RefreshToken_ValidRequest_ReturnsOkResult()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
+            var mockCommandMediator = new Mock<ICommandMediator>();
             var expectedResponse = new LoginUserResponse(
                 Guid.NewGuid(),
                 "testuser",
@@ -80,11 +80,11 @@ namespace LinkShortener.Tests.UnitTests.Controllers
                 "new_token",
                 "new_refresh_token");
 
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()))
+            mockCommandMediator
+                .Setup(m => m.SendAsync(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
-            var controller = new AuthController(mockMediator.Object);
+            var controller = new AuthController(mockCommandMediator.Object);
             var request = new RefreshTokenRequest("valid_refresh_token");
 
             // Act
@@ -92,19 +92,19 @@ namespace LinkShortener.Tests.UnitTests.Controllers
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
-            mockMediator.Verify(m => m.Send(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockCommandMediator.Verify(m => m.SendAsync(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task VerifyEmailCode_ValidCode_ReturnsOkResult()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<VerifyEmailCodeCommand>(), It.IsAny<CancellationToken>()))
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            mockCommandMediator
+                .Setup(m => m.SendAsync(It.IsAny<VerifyEmailCodeCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var controller = new AuthController(mockMediator.Object);
+            var controller = new AuthController(mockCommandMediator.Object);
             var request = new VerifyEmailCodeRequest { Email = "test@example.com", Code = "123456" };
 
             // Act
@@ -118,12 +118,12 @@ namespace LinkShortener.Tests.UnitTests.Controllers
         public async Task VerifyEmailCode_InvalidCode_ReturnsBadRequest()
         {
             // Arrange
-            var mockMediator = new Mock<IMediator>();
-            mockMediator
-                .Setup(m => m.Send(It.IsAny<VerifyEmailCodeCommand>(), It.IsAny<CancellationToken>()))
+            var mockCommandMediator = new Mock<ICommandMediator>();
+            mockCommandMediator
+                .Setup(m => m.SendAsync(It.IsAny<VerifyEmailCodeCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
-            var controller = new AuthController(mockMediator.Object);
+            var controller = new AuthController(mockCommandMediator.Object);
             var request = new VerifyEmailCodeRequest { Email = "test@example.com", Code = "wrong" };
 
             // Act

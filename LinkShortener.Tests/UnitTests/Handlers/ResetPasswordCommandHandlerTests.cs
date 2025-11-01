@@ -32,7 +32,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new ResetPasswordCommand("test@example.com", "123456", "NewPassword123!@#");
 
             // Act
-            await handler.Handle(command, CancellationToken.None);
+            await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             mockUserRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -59,7 +59,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                handler.Handle(command, CancellationToken.None));
+                handler.HandleAsync(command, CancellationToken.None));
         }
     }
 }

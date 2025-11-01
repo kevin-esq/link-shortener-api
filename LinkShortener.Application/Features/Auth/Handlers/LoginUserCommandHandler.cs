@@ -3,11 +3,11 @@ using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using LinkShortener.Domain.Entities;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginUserResponse>
+    public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, LoginUserResponse>
     {
         private readonly IUserRepository _repository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
@@ -29,7 +29,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<LoginUserResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<LoginUserResponse> HandleAsync(LoginUserCommand request, CancellationToken cancellationToken)
         {
             var user = await _repository.GetByEmailAsync(request.Email, cancellationToken);
             if (user == null)

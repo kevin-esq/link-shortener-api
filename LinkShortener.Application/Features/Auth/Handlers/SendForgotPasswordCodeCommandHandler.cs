@@ -1,12 +1,12 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using System.Security.Cryptography;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class SendForgotPasswordCodeCommandHandler : IRequestHandler<SendForgotPasswordCodeCommand>
+    public class SendForgotPasswordCodeCommandHandler : ICommandHandler<SendForgotPasswordCodeCommand>
     {
         private readonly IUserRepository _repository;
         private readonly IEmailService _emailService;
@@ -22,7 +22,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _codeStore = codeStore;
         }
 
-        public async Task Handle(SendForgotPasswordCodeCommand request, CancellationToken cancellationToken)
+        public async Task HandleAsync(SendForgotPasswordCodeCommand request, CancellationToken cancellationToken)
         {
             var user = await _repository.GetByEmailAsync(request.Email, cancellationToken);
             if (user == null)
