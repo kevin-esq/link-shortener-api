@@ -1,4 +1,4 @@
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Queries
 {
@@ -6,7 +6,7 @@ namespace LinkShortener.Application.Features.Url.Queries
         string Code,
         Guid UserId,
         int Size = 300,
-        string Format = "png") : IRequest<QrCodeResponse?>;
+        string Format = "png") : IQuery<QrCodeResponse?>;
 
     public record QrCodeResponse(
         string Code,

@@ -30,7 +30,7 @@ namespace LinkShortener.Tests.UnitTests.Features
                 .ReturnsAsync((Link?)null);
 
             var query = new GetQrCodeQuery("INVALID", userId);
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.HandleAsync(query, CancellationToken.None);
 
             Assert.Null(result);
         }
@@ -47,7 +47,7 @@ namespace LinkShortener.Tests.UnitTests.Features
                 .ReturnsAsync(link);
 
             var query = new GetQrCodeQuery("ABC123", userId);
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.HandleAsync(query, CancellationToken.None);
 
             Assert.Null(result);
         }

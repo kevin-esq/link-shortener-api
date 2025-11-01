@@ -2,7 +2,8 @@ using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Url.Commands;
 using LinkShortener.Application.Features.Url.DTOs;
 using LinkShortener.Application.Features.Url.Queries;
-using MediatR;
+using LiteBus.Commands.Abstractions;
+using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,9 +15,11 @@ namespace LinkShortener.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class UrlController(IMediator mediator, IClickEventService clickEventService) : ControllerBase
+    public class UrlController(IUrlRepository urlRepository, ICommandMediator commandMediator, IQueryMediator queryMediator, IClickEventService clickEventService) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
+        private readonly IUrlRepository _urlRepository = urlRepository;
+        private readonly ICommandMediator _commandMediator = commandMediator;
+        private readonly IQueryMediator _queryMediator = queryMediator;
         private readonly IClickEventService _clickEventService = clickEventService;
 
         /// <summary>
@@ -49,7 +52,7 @@ namespace LinkShortener.Api.Controllers
             if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 return Unauthorized("Invalid user token.");
 
-            var result = await _mediator.Send(new ShortenUrlCommand(
+            var result = await _commandMediator.SendAsync(new ShortenUrlCommand(
                 request.Url,
                 Request.Scheme,
                 Request.Host.ToString(),
@@ -76,7 +79,7 @@ namespace LinkShortener.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RedirectToLongUrl(string Code)
         {
-            var result = await _mediator.Send(new GetPublicUrlInfoQuery(
+            var result = await _queryMediator.QueryAsync(new GetPublicUrlInfoQuery(
                 Code,
                 Request.Scheme,
                 Request.Host.ToString()),
@@ -93,8 +96,8 @@ namespace LinkShortener.Api.Controllers
 
             // Record link access with enhanced analytics
             var startTime = DateTime.UtcNow;
-            
-            await _mediator.Send(new RegisterLinkAccessCommand(
+
+            await _commandMediator.SendAsync(new RegisterLinkAccessCommand(
                 LinkId: result.Id,
                 IpAddress: ipString,
                 UserAgent: Request.Headers.UserAgent.ToString() ?? "Unknown",
@@ -159,7 +162,7 @@ namespace LinkShortener.Api.Controllers
 
             var userId = Guid.Parse(userIdClaim);
 
-            var result = await _mediator.Send(new GetPrivateUrlInfoQuery(
+            var result = await _queryMediator.QueryAsync(new GetPrivateUrlInfoQuery(
                 code,
                 Request.Scheme,
                 Request.Host.ToString(),
@@ -188,8 +191,8 @@ namespace LinkShortener.Api.Controllers
 
             var userId = Guid.Parse(userIdClaim);
 
-            var result = await _mediator.Send(
-                new GetUserLinksQuery(userId, page, pageSize, search, orderBy, orderDirection), 
+            var result = await _queryMediator.QueryAsync(
+                new GetUserLinksQuery(userId, page, pageSize, search, orderBy, orderDirection),
                 cancellationToken);
             return Ok(result);
         }
@@ -204,8 +207,8 @@ namespace LinkShortener.Api.Controllers
 
             var userId = Guid.Parse(userIdClaim);
 
-            var result = await _mediator.Send(new DeleteLinkCommand(code, userId), cancellationToken);
-            
+            var result = await _commandMediator.SendAsync(new DeleteLinkCommand(code, userId), cancellationToken);
+
             if (!result)
                 return NotFound();
 
@@ -225,8 +228,8 @@ namespace LinkShortener.Api.Controllers
 
             var userId = Guid.Parse(userIdClaim);
 
-            var result = await _mediator.Send(new GetLinkStatsQuery(code, userId, days), cancellationToken);
-            
+            var result = await _queryMediator.QueryAsync(new GetLinkStatsQuery(code, userId, days), cancellationToken);
+
             if (result is null)
                 return NotFound();
 
@@ -246,8 +249,8 @@ namespace LinkShortener.Api.Controllers
 
             var userId = Guid.Parse(userIdClaim);
 
-            var result = await _mediator.Send(new GetQrCodeQuery(code, userId, size), cancellationToken);
-            
+            var result = await _queryMediator.QueryAsync(new GetQrCodeQuery(code, userId, size), cancellationToken);
+
             if (result is null)
                 return NotFound();
 

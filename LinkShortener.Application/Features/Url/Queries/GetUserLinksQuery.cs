@@ -1,5 +1,5 @@
 using LinkShortener.Application.Features.Url.DTOs;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Queries
 {
@@ -9,7 +9,7 @@ namespace LinkShortener.Application.Features.Url.Queries
         int PageSize,
         string? Search = null,
         string? OrderBy = "createdAt",
-        string? OrderDirection = "desc") : IRequest<UserLinksResponse>;
+        string? OrderDirection = "desc") : IQuery<UserLinksResponse>;
 
     public record UserLinksResponse(
         List<LinkSummaryDto> Links,

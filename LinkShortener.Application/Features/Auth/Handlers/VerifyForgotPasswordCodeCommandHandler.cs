@@ -1,10 +1,10 @@
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class VerifyForgotPasswordCodeCommandHandler : IRequestHandler<VerifyForgotPasswordCodeCommand, bool>
+    public class VerifyForgotPasswordCodeCommandHandler : ICommandHandler<VerifyForgotPasswordCodeCommand, bool>
     {
         private readonly IVerificationCodeStore _codeStore;
 
@@ -13,7 +13,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _codeStore = codeStore;
         }
 
-        public async Task<bool> Handle(VerifyForgotPasswordCodeCommand request, CancellationToken cancellationToken)
+        public async Task<bool> HandleAsync(VerifyForgotPasswordCodeCommand request, CancellationToken cancellationToken)
         {
             var storedCode = await _codeStore.GetCodeAsync(request.Email, cancellationToken);
             if (string.IsNullOrEmpty(storedCode))

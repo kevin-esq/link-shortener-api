@@ -25,7 +25,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var query = new GetPublicUrlInfoQuery("ABC1234", "https", "localhost:7205");
 
             // Act
-            var result = await handler.Handle(query, CancellationToken.None);
+            var result = await handler.HandleAsync(query, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -47,7 +47,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var query = new GetPublicUrlInfoQuery("INVALID", "https", "localhost:7205");
 
             // Act
-            var result = await handler.Handle(query, CancellationToken.None);
+            var result = await handler.HandleAsync(query, CancellationToken.None);
 
             // Assert
             Assert.Null(result);
@@ -63,7 +63,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                handler.Handle(query, CancellationToken.None));
+                handler.HandleAsync(query, CancellationToken.None));
         }
     }
 }

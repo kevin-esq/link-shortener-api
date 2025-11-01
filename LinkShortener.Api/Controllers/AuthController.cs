@@ -1,7 +1,7 @@
 using LinkShortener.Application.Common.Models;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +9,9 @@ namespace LinkShortener.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IMediator mediator) : ControllerBase
+    public class AuthController(ICommandMediator commandMediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
+        private readonly ICommandMediator _commandMediator = commandMediator;
 
         /// <summary>
         /// Registers a new user account and sends email verification code.
@@ -58,7 +58,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 400)]
         public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new RegisterUserCommand(
+            var result = await _commandMediator.SendAsync(new RegisterUserCommand(
                 request.Username,
                 request.Email,
                 request.Password),
@@ -110,7 +110,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 401)]
         public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new LoginUserCommand(
+            var result = await _commandMediator.SendAsync(new LoginUserCommand(
                 request.Email,
                 request.Password),
                 cancellationToken);
@@ -129,7 +129,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 404)]
         public async Task<IActionResult> SendForgotPasswordCode([FromQuery] string email, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new SendForgotPasswordCodeCommand(email), cancellationToken);
+            await _commandMediator.SendAsync(new SendForgotPasswordCodeCommand(email), cancellationToken);
             return Ok(ApiResponse.SuccessResponse("Verification code sent to email"));
         }
 
@@ -144,7 +144,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 400)]
         public async Task<IActionResult> VerifyForgotPasswordCode([FromBody] VerifyForgotPasswordCodeRequest request, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new VerifyForgotPasswordCodeCommand(request.Email, request.Code), cancellationToken);
+            var result = await _commandMediator.SendAsync(new VerifyForgotPasswordCodeCommand(request.Email, request.Code), cancellationToken);
             return Ok(ApiResponse<bool>.SuccessResponse(result, "Code verified successfully"));
         }
 
@@ -159,7 +159,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 400)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new ResetPasswordCommand(request.Email, request.ResetCode, request.NewPassword), cancellationToken);
+            await _commandMediator.SendAsync(new ResetPasswordCommand(request.Email, request.ResetCode, request.NewPassword), cancellationToken);
             return Ok(ApiResponse.SuccessResponse("Password successfully reset"));
         }
 
@@ -196,7 +196,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 400)]
         public async Task<IActionResult> SendVerifyEmailCode([FromQuery] string email, CancellationToken ct)
         {
-            await _mediator.Send(new SendVerifyEmailCodeCommand(email), ct);
+            await _commandMediator.SendAsync(new SendVerifyEmailCodeCommand(email), ct);
             return Ok(ApiResponse.SuccessResponse("Verification code sent to email"));
         }
 
@@ -232,7 +232,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 400)]
         public async Task<IActionResult> VerifyEmailCode([FromBody] VerifyEmailCodeRequest request, CancellationToken ct)
         {
-            var isValid = await _mediator.Send(new VerifyEmailCodeCommand(request.Email, request.Code), ct);
+            var isValid = await _commandMediator.SendAsync(new VerifyEmailCodeCommand(request.Email, request.Code), ct);
             if (!isValid)
                 return BadRequest(ApiResponse.ErrorResponse("Invalid or expired code"));
 
@@ -274,7 +274,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 401)]
         public async Task<IActionResult> GoogleAuth([FromBody] GoogleAuthRequest request, CancellationToken ct)
         {
-            var result = await _mediator.Send(new GoogleAuthCommand(request.IdToken), ct);
+            var result = await _commandMediator.SendAsync(new GoogleAuthCommand(request.IdToken), ct);
             return Ok(ApiResponse<LoginUserResponse>.SuccessResponse(result, "Google authentication successful"));
         }
 
@@ -322,7 +322,7 @@ namespace LinkShortener.Api.Controllers
         [ProducesResponseType(typeof(ErrorDetails), 401)]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken ct)
         {
-            var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken), ct);
+            var result = await _commandMediator.SendAsync(new RefreshTokenCommand(request.RefreshToken), ct);
             return Ok(ApiResponse<LoginUserResponse>.SuccessResponse(result, "Tokens refreshed successfully"));
         }
     }

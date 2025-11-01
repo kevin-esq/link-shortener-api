@@ -4,12 +4,12 @@ using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Features.Auth.Commands;
 using LinkShortener.Application.Features.Auth.DTOs;
 using LinkShortener.Domain.Entities;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class GoogleAuthCommandHandler : IRequestHandler<GoogleAuthCommand, LoginUserResponse>
+    public class GoogleAuthCommandHandler : ICommandHandler<GoogleAuthCommand, LoginUserResponse>
     {
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IUserRepository _userRepository;
@@ -34,7 +34,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _logger = logger;
         }
 
-        public async Task<LoginUserResponse> Handle(GoogleAuthCommand request, CancellationToken ct)
+        public async Task<LoginUserResponse> HandleAsync(GoogleAuthCommand request, CancellationToken ct)
         {
             var googleUser = await _googleAuthService.ValidateGoogleTokenAsync(request.IdToken, ct);
             if (googleUser == null)

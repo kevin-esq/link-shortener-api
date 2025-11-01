@@ -33,7 +33,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new VerifyEmailCodeCommand("test@example.com", "123456");
 
             // Act
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             Assert.True(result);
@@ -60,7 +60,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new VerifyEmailCodeCommand("test@example.com", "wrong_code");
 
             // Act
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             Assert.False(result);
@@ -85,7 +85,7 @@ namespace LinkShortener.Tests.UnitTests.Handlers
             var command = new VerifyEmailCodeCommand("test@example.com", "123456");
 
             // Act
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.HandleAsync(command, CancellationToken.None);
 
             // Assert
             Assert.False(result);

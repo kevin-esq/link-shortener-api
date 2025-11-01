@@ -1,11 +1,11 @@
-using MediatR;
+using LiteBus.Queries.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Queries
 {
     public record GetLinkStatsQuery(
         string Code,
         Guid UserId,
-        int Days) : IRequest<LinkStatsResponse?>;
+        int Days) : IQuery<LinkStatsResponse?>;
 
     public record LinkStatsResponse(
         string Code,

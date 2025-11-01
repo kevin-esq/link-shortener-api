@@ -76,18 +76,18 @@ namespace LinkShortener.Domain.Entities
         public const string UserPasswordChange = "user.password_change";
         public const string UserEmailChange = "user.email_change";
         public const string UserRoleChange = "user.role_change";
-        
+
         public const string LinkCreate = "link.create";
         public const string LinkUpdate = "link.update";
         public const string LinkDelete = "link.delete";
         public const string LinkExpire = "link.expire";
-        
+
         public const string AdminElevation = "admin.elevation";
         public const string AdminApiKeyGenerate = "admin.api_key.generate";
         public const string AdminApiKeyRevoke = "admin.api_key.revoke";
         public const string AdminDataExport = "admin.data.export";
         public const string AdminConfigChange = "admin.config.change";
-        
+
         public const string SecurityLogin2FA = "security.2fa.login";
         public const string SecurityLoginFailed = "security.login.failed";
         public const string SecurityLockout = "security.lockout";

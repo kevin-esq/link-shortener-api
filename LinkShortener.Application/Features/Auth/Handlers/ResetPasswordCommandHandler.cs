@@ -3,11 +3,11 @@ using LinkShortener.Application.Abstractions.Security;
 using LinkShortener.Application.Abstractions.Services;
 using LinkShortener.Application.Common.Validators;
 using LinkShortener.Application.Features.Auth.Commands;
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Auth.Handlers
 {
-    public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
+    public class ResetPasswordCommandHandler : ICommandHandler<ResetPasswordCommand>
     {
         private readonly IUserRepository _repository;
         private readonly IVerificationCodeStore _codeStore;
@@ -23,7 +23,7 @@ namespace LinkShortener.Application.Features.Auth.Handlers
             _passwordHasher = passwordHasher;
         }
 
-        public async Task Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+        public async Task HandleAsync(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
             var storedCode = await _codeStore.GetCodeAsync(request.Email, cancellationToken);
             if (string.IsNullOrEmpty(storedCode) || storedCode != request.Code)

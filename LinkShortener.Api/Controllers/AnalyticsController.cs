@@ -1,5 +1,5 @@
 using LinkShortener.Application.Features.Analytics.Queries;
-using MediatR;
+using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -15,11 +15,11 @@ namespace LinkShortener.Api.Controllers
     [Authorize]
     public class AnalyticsController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly IQueryMediator _queryMediator;
 
-        public AnalyticsController(IMediator mediator)
+        public AnalyticsController(IQueryMediator queryMediator)
         {
-            _mediator = mediator;
+            _queryMediator = queryMediator;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace LinkShortener.Api.Controllers
             if (days < 1 || days > 365)
                 return BadRequest("Days parameter must be between 1 and 365");
 
-            var result = await _mediator.Send(new GetLinkAnalyticsQuery(linkId, days));
+            var result = await _queryMediator.QueryAsync(new GetLinkAnalyticsQuery(linkId, days));
 
             if (result == null)
                 return NotFound("Link not found");
@@ -70,7 +70,7 @@ namespace LinkShortener.Api.Controllers
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized("User ID not found in token");
 
-            var result = await _mediator.Send(new GetUserDashboardQuery(userId, days));
+            var result = await _queryMediator.QueryAsync(new GetUserDashboardQuery(userId, days));
 
             return Ok(result);
         }
@@ -92,7 +92,7 @@ namespace LinkShortener.Api.Controllers
                 return Unauthorized("User ID not found in token");
 
             // Get lightweight dashboard data for last 7 days
-            var result = await _mediator.Send(new GetUserDashboardQuery(userId, 7));
+            var result = await _queryMediator.QueryAsync(new GetUserDashboardQuery(userId, 7));
 
             var summary = new
             {

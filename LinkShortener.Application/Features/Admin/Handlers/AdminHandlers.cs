@@ -1,12 +1,13 @@
 using LinkShortener.Application.Abstractions;
 using LinkShortener.Application.Features.Admin.Commands;
 using LinkShortener.Application.Features.Admin.DTOs;
-using MediatR;
+using LiteBus.Commands.Abstractions;
+using LiteBus.Queries.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace LinkShortener.Application.Features.Admin.Handlers
 {
-    public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserListResponse>>
+    public class GetAllUsersHandler : IQueryHandler<GetAllUsersQuery, List<UserListResponse>>
     {
         private readonly IUserRepository _userRepository;
 
@@ -15,7 +16,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _userRepository = userRepository;
         }
 
-        public async Task<List<UserListResponse>> Handle(GetAllUsersQuery request, CancellationToken ct)
+        public async Task<List<UserListResponse>> HandleAsync(GetAllUsersQuery request, CancellationToken ct)
         {
             var users = await _userRepository.GetAllAsync(request.Page, request.PageSize, ct);
 
@@ -33,7 +34,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
         }
     }
 
-    public class GetUserDetailHandler : IRequestHandler<GetUserDetailQuery, UserDetailResponse>
+    public class GetUserDetailHandler : IQueryHandler<GetUserDetailQuery, UserDetailResponse>
     {
         private readonly IUserRepository _userRepository;
         private readonly ISessionRepository _sessionRepository;
@@ -44,7 +45,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _sessionRepository = sessionRepository;
         }
 
-        public async Task<UserDetailResponse> Handle(GetUserDetailQuery request, CancellationToken ct)
+        public async Task<UserDetailResponse> HandleAsync(GetUserDetailQuery request, CancellationToken ct)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId, ct);
             if (user == null)
@@ -72,7 +73,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
         }
     }
 
-    public class SuspendUserHandler : IRequestHandler<SuspendUserCommand, Unit>
+    public class SuspendUserHandler : ICommandHandler<SuspendUserCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<SuspendUserHandler> _logger;
@@ -83,7 +84,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(SuspendUserCommand request, CancellationToken ct)
+        public async Task HandleAsync(SuspendUserCommand request, CancellationToken ct)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId, ct);
             if (user == null)
@@ -93,11 +94,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             await _userRepository.SaveChangesAsync(ct);
 
             _logger.LogInformation("User {UserId} suspended. Reason: {Reason}", request.UserId, request.Reason);
-            return Unit.Value;
         }
     }
 
-    public class BanUserHandler : IRequestHandler<BanUserCommand, Unit>
+    public class BanUserHandler : ICommandHandler<BanUserCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly ISessionRepository _sessionRepository;
@@ -116,7 +116,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(BanUserCommand request, CancellationToken ct)
+        public async Task HandleAsync(BanUserCommand request, CancellationToken ct)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId, ct);
             if (user == null)
@@ -129,11 +129,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             await _userRepository.SaveChangesAsync(ct);
 
             _logger.LogWarning("User {UserId} banned. Reason: {Reason}", request.UserId, request.Reason);
-            return Unit.Value;
         }
     }
 
-    public class UnsuspendUserHandler : IRequestHandler<UnsuspendUserCommand, Unit>
+    public class UnsuspendUserHandler : ICommandHandler<UnsuspendUserCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<UnsuspendUserHandler> _logger;
@@ -144,7 +143,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(UnsuspendUserCommand request, CancellationToken ct)
+        public async Task HandleAsync(UnsuspendUserCommand request, CancellationToken ct)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId, ct);
             if (user == null)
@@ -154,11 +153,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             await _userRepository.SaveChangesAsync(ct);
 
             _logger.LogInformation("User {UserId} unsuspended", request.UserId);
-            return Unit.Value;
         }
     }
 
-    public class AddRoleHandler : IRequestHandler<AddRoleCommand, Unit>
+    public class AddRoleHandler : ICommandHandler<AddRoleCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<AddRoleHandler> _logger;
@@ -169,7 +167,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(AddRoleCommand request, CancellationToken ct)
+        public async Task HandleAsync(AddRoleCommand request, CancellationToken ct)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId, ct);
             if (user == null)
@@ -179,11 +177,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             await _userRepository.SaveChangesAsync(ct);
 
             _logger.LogInformation("Role {Role} added to user {UserId}", request.Role, request.UserId);
-            return Unit.Value;
         }
     }
 
-    public class RemoveRoleHandler : IRequestHandler<RemoveRoleCommand, Unit>
+    public class RemoveRoleHandler : ICommandHandler<RemoveRoleCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<RemoveRoleHandler> _logger;
@@ -194,7 +191,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(RemoveRoleCommand request, CancellationToken ct)
+        public async Task HandleAsync(RemoveRoleCommand request, CancellationToken ct)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId, ct);
             if (user == null)
@@ -204,11 +201,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             await _userRepository.SaveChangesAsync(ct);
 
             _logger.LogInformation("Role {Role} removed from user {UserId}", request.Role, request.UserId);
-            return Unit.Value;
         }
     }
 
-    public class GetUserSessionsHandler : IRequestHandler<GetUserSessionsQuery, List<SessionResponse>>
+    public class GetUserSessionsHandler : IQueryHandler<GetUserSessionsQuery, List<SessionResponse>>
     {
         private readonly ISessionRepository _sessionRepository;
 
@@ -217,7 +213,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _sessionRepository = sessionRepository;
         }
 
-        public async Task<List<SessionResponse>> Handle(GetUserSessionsQuery request, CancellationToken ct)
+        public async Task<List<SessionResponse>> HandleAsync(GetUserSessionsQuery request, CancellationToken ct)
         {
             var sessions = await _sessionRepository.GetAllByUserIdAsync(request.UserId, ct);
 
@@ -236,7 +232,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
         }
     }
 
-    public class EndUserSessionHandler : IRequestHandler<EndUserSessionCommand, Unit>
+    public class EndUserSessionHandler : ICommandHandler<EndUserSessionCommand>
     {
         private readonly ISessionRepository _sessionRepository;
         private readonly ILogger<EndUserSessionHandler> _logger;
@@ -247,7 +243,7 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(EndUserSessionCommand request, CancellationToken ct)
+        public async Task HandleAsync(EndUserSessionCommand request, CancellationToken ct)
         {
             var session = await _sessionRepository.GetByIdAsync(request.SessionId, ct);
             if (session == null || session.UserId != request.UserId)
@@ -257,11 +253,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             await _sessionRepository.SaveChangesAsync(ct);
 
             _logger.LogInformation("Session {SessionId} ended for user {UserId}", request.SessionId, request.UserId);
-            return Unit.Value;
         }
     }
 
-    public class EndAllUserSessionsHandler : IRequestHandler<EndAllUserSessionsCommand, Unit>
+    public class EndAllUserSessionsHandler : ICommandHandler<EndAllUserSessionsCommand>
     {
         private readonly ISessionRepository _sessionRepository;
         private readonly ILogger<EndAllUserSessionsHandler> _logger;
@@ -272,15 +267,14 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(EndAllUserSessionsCommand request, CancellationToken ct)
+        public async Task HandleAsync(EndAllUserSessionsCommand request, CancellationToken ct)
         {
             await _sessionRepository.EndAllUserSessionsAsync(request.UserId, ct);
             _logger.LogInformation("All sessions ended for user {UserId}", request.UserId);
-            return Unit.Value;
         }
     }
 
-    public class RevokeAllRefreshTokensHandler : IRequestHandler<RevokeAllRefreshTokensCommand, Unit>
+    public class RevokeAllRefreshTokensHandler : ICommandHandler<RevokeAllRefreshTokensCommand>
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly ILogger<RevokeAllRefreshTokensHandler> _logger;
@@ -293,11 +287,10 @@ namespace LinkShortener.Application.Features.Admin.Handlers
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(RevokeAllRefreshTokensCommand request, CancellationToken ct)
+        public async Task HandleAsync(RevokeAllRefreshTokensCommand request, CancellationToken ct)
         {
             await _refreshTokenRepository.RevokeAllUserTokensAsync(request.UserId, ct);
             _logger.LogInformation("All refresh tokens revoked for user {UserId}", request.UserId);
-            return Unit.Value;
         }
     }
 }

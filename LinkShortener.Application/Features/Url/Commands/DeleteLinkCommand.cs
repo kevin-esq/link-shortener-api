@@ -1,8 +1,8 @@
-using MediatR;
+using LiteBus.Commands.Abstractions;
 
 namespace LinkShortener.Application.Features.Url.Commands
 {
     public record DeleteLinkCommand(
         string Code,
-        Guid UserId) : IRequest<bool>;
+        Guid UserId) : ICommand<bool>;
 }
